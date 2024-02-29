@@ -1,0 +1,51 @@
+
+model{
+  # Likelihood
+  for(i in 1:M) {
+    # process
+    w[i] ~ dbern(omega)  # inclusion parameter
+    # first year
+    z[i, 1] ~ dbern(eta[1])
+    # subsequent years
+    for(t in 2:nYears) {
+      z[i, t] ~ dbern(phi[t-1] * z[i, t-1] + eta[t] * (1 - max(z[i, 1:(t-1)])))
+    }
+    # detection
+    for(t in 1:nYears) {
+      y[i, t] ~ dbern(p[t] * z[i, t] * w[i])
+    }
+  }
+
+  # Priors
+  omega ~ dbeta(1,1)
+
+  # Dirichlet prior for b
+  # b[1:nYears] ~ ddirch(rep(1,nYears))  # Error: Cannot normalize density
+  for(t in 1:nYears) {
+    tmp[t] ~ dgamma(1, 1)
+  }
+  b[1:nYears] <- tmp / sum(tmp)
+
+  # calculate eta
+  eta[1] <- b[1]
+  for(t in 2:nYears) {
+    eta[t] <- b[t] / (1 - sum(b[1:(t-1)]))
+  }
+
+  for(t in 1:(nYears-1)) {
+    phi[t] ~ dbeta(1, 1)
+  }
+  for(t in 1:nYears) {
+    p[t] ~ dbeta(1, 1)
+  }
+
+  # Derived variables
+  for(t in 1:nYears) {
+    N[t] <- sum(z[,t]*w) # no. alive for each year
+  }
+  Nsuper <- sum(w)       # no. alive during the study
+  B[1] <- sum(z[, 1]*w)
+  for(t in 2:nYears) {
+    B[t] <- sum((1-z[, t-1])*z[, t]*w) # no. added each year
+  }
+}
