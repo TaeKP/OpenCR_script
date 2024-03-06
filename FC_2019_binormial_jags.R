@@ -73,16 +73,19 @@ jagsData <- list(y = yAug, M = M, nOcc = 75, A=A,
                  w = c(rep(1, nCaps), rep(NA, M-nCaps)),
                  Detlocs = Detlocs, nDetlocs = nDetlocs,
                  xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax)
+# CRN: "Glue together" data from all 3 years into arrays of the correct dimension
+# (see in jags code below)
+
 str(jagsData)
 
 # List of 10
-# $ y       : num [1:84, 1:50] 0 0 0 0 0 0 0 0 0 0 ...
+# $ y       : num [1:x, 1:50, 1:3] 0 0 0 0 0 0 0 0 0 0 ...
 # ..- attr(*, "dimnames")=List of 2
 # .. ..$ : NULL
 # .. ..$ : chr [1:50] "trap01" "trap02" "trap03" "trap04" ...
-# $ M       : int 84
-# $ nOcc    : num 75
-# $ w       : num [1:84] 1 1 1 1 1 1 1 1 1 1 ...
+# $ M       : num [1:3]
+# $ nOcc    : num [1:3]
+# $ w       : num [1:x, ] 1 1 1 1 1 1 1 1 1 1 ...
 # $ Detlocs : num [1:50, 1:2] -6.25 -7.79 -5.63 -3.36 -1.35 ...
 # ..- attr(*, "dimnames")=List of 2
 # .. ..$ : NULL
@@ -96,36 +99,37 @@ str(jagsData)
 # $ ymax    : num 29.5
 
 # Write JAGS model file
-cat(file="SCRfc_binorm.jags", "
+cat(file="SCRfc_yrLoop_binom.jags", "
 model{
   
   for(t in 1:Tmax){
   
     # Priors
-    p0 ~ dbeta(1, 1)          # Baseline detection probability
-    sigma ~ dunif(0, 3)       # Half-normal scale
-    omega ~ dbeta(1, 1)       # Data augmentation parameter
+    p0[t] ~ dbeta(1, 1)          # Baseline detection probability
+    sigma[t] ~ dunif(0, 3)       # Half-normal scale
+    omega[t] ~ dbeta(1, 1)       # Data augmentation parameter
   
     # Likelihood
-    for(i in 1:M){             # Loop over all M individuals
-      w[i] ~ dbern(omega)      # w = 1 if animal is real/present
+    for(i in 1:M[t]){             # Loop over all M individuals
+    
+      w[i,t] ~ dbern(omega[t])      # w = 1 if animal is real/present
       
       # State model: point process model
-      AC[i, 1] ~ dunif(xmin, xmax) # x-coord of activity centre
-      AC[i, 2] ~ dunif(ymin, ymax) # y coord of activity centre
+      AC[i, 1, t] ~ dunif(xmin[t], xmax[t]) # x-coord of activity centre
+      AC[i, 2, t] ~ dunif(ymin[t], ymax[t]) # y coord of activity centre
       
       # Observation model: p ~ distance between trap and estimated AC
-      for(j in 1:nDetlocs){           # Loop over all detectors
-        d2[i,j] <- (AC[i,1] - Detlocs[j,1])^2 +
-        (AC[i,2] - Detlocs[j,2])^2           # distance^2
-      p[i,j] <- p0 * exp(- d2[i,j]/(2*sigma^2)) # Detection prob
-      y[i,j] ~ dbin(p[i,j] * w[i], nOcc)     # The observed data
+      for(j in 1:nDetlocs[t]){           # Loop over all detectors
+        d2[i, j, t] <- (AC[i, 1, t] - Detlocs[j, 1, t])^2 +
+        (AC[i, 2, t] - Detlocs[j, 2, t])^2           # distance^2
+      p[i, j, t] <- p0[t] * exp(- d2[i, j, t]/(2*sigma[t]^2)) # Detection prob
+      y[i, j, t] ~ dbin(p[i, j, t] * w[i, t], nOcc)     # The observed data
       }
     }
 
     # Derived quantities
-    N <- sum(w)                       # Population size in state-space (=area)
-    D <- N / A                        # Density over state-space
+    N[t] <- sum(w[t])                       # Population size in state-space (=area)
+    D[t] <- N[t] / A[t]                        # Density over state-space
   }
 }
 ")
@@ -139,7 +143,7 @@ parameters <- c("p0", "sigma", "omega", "N", "D", "AC", "w")
 ni <- 1000; nb <- 50; nc <- 3; nt <- 5; na <- 1000
 
 #load("FC2019_jagsUI.RData")
-out <- jags(jagsData, NULL, parameters, "SCRfc_binorm.jags", n.iter=ni, n.burnin=nb, n.chains=nc,
+out <- jags(jagsData, NULL, parameters, "SCRfc_yrLoop_binom.jags", n.iter=ni, n.burnin=nb, n.chains=nc,
               n.thin=nt, n.adapt=na, DIC=FALSE, parallel=TRUE)
 
 #save(out, file="FC2019_jagsUI.RData")
