@@ -98,30 +98,36 @@ str(jagsData)
 # Write JAGS model file
 cat(file="SCRfc_binorm.jags", "
 model{
-   # Priors
-  p0 ~ dbeta(1, 1)          # Baseline detection probability
-  sigma ~ dunif(0, 3)       # Half-normal scale
-  omega ~ dbeta(1, 1)       # Data augmentation parameter
   
-  # Likelihood
-  for(i in 1:M){             # Loop over all M individuals
-    w[i] ~ dbern(omega)      # w = 1 if animal is real/present
-    # State model: point process model
-    AC[i, 1] ~ dunif(xmin, xmax) # x-coord of activity centre
-    AC[i, 2] ~ dunif(ymin, ymax) # y coord of activity centre
-    # Observation model: p ~ distance between trap and estimated AC
-    for(j in 1:nDetlocs){           # Loop over all detectors
-      d2[i,j] <- (AC[i,1] - Detlocs[j,1])^2 +
+  for(t in 1:Tmax){
+  
+    # Priors
+    p0 ~ dbeta(1, 1)          # Baseline detection probability
+    sigma ~ dunif(0, 3)       # Half-normal scale
+    omega ~ dbeta(1, 1)       # Data augmentation parameter
+  
+    # Likelihood
+    for(i in 1:M){             # Loop over all M individuals
+      w[i] ~ dbern(omega)      # w = 1 if animal is real/present
+      
+      # State model: point process model
+      AC[i, 1] ~ dunif(xmin, xmax) # x-coord of activity centre
+      AC[i, 2] ~ dunif(ymin, ymax) # y coord of activity centre
+      
+      # Observation model: p ~ distance between trap and estimated AC
+      for(j in 1:nDetlocs){           # Loop over all detectors
+        d2[i,j] <- (AC[i,1] - Detlocs[j,1])^2 +
         (AC[i,2] - Detlocs[j,2])^2           # distance^2
-     p[i,j] <- p0 * exp(- d2[i,j]/(2*sigma^2)) # Detection prob
-     y[i,j] ~ dbin(p[i,j] * w[i], nOcc)     # The observed data
+      p[i,j] <- p0 * exp(- d2[i,j]/(2*sigma^2)) # Detection prob
+      y[i,j] ~ dbin(p[i,j] * w[i], nOcc)     # The observed data
+      }
     }
-  }
 
-  # Derived quantities
-  N <- sum(w)                       # Population size in state-space (=area)
-  D <- N / A                        # Density over state-space
+    # Derived quantities
+    N <- sum(w)                       # Population size in state-space (=area)
+    D <- N / A                        # Density over state-space
   }
+}
 ")
 
 # Run the model
