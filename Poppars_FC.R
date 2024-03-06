@@ -16,8 +16,8 @@ str(sims)
 # $ y3: int  0 0 0 0 0 0 0 0 0 0 ...
 
 y <- as.matrix(sims)
-( nInd <- nrow(y) )   # 127
-( nYears <- ncol(y) ) # 3
+nInd <- nrow(y)   # 127
+nYears <- ncol(y) # 3
 
 # Prepare for the JAGS run
 # ========================
