@@ -10,14 +10,10 @@ library(mcmcOutput)  # for plotting functions
 
 sims <- read.csv("FC_3years.csv")
 str(sims)
-# 'data.frame':	127 obs. of  3 variables:
-# $ y1: int  1 1 1 1 1 1 1 1 1 1 ...
-# $ y2: int  1 0 0 0 1 0 1 0 0 0 ...
-# $ y3: int  0 0 0 0 0 0 0 0 0 0 ...
 
 y <- as.matrix(sims)
-( nInd <- nrow(y) )   # 127
-( nYears <- ncol(y) ) # 3
+nInd <- nrow(y)   # 127
+nYears <- ncol(y) # 3
 
 # Prepare for the JAGS run
 # ========================
