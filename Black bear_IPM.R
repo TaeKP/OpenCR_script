@@ -151,6 +151,69 @@ model {
 }
 ")
 
+# Added JAGS model without the occupancy data here!
+cat(file="model2_removed_occ", "
+model {
+  # Priors
+  psi ~ dunif(0, 1)                               # M*psi = E[N(1)], for data augmentation
+  phi ~ dunif(0, 1)                               # Survival
+  gamma ~ dunif(0, 3)                             # Per-capita recruitment
+  p0 ~ dunif(0, 1)                                # Baseline capture probability
+  sigma ~ dunif(0, 50)                            # Scale parameter of detection function
+
+  # Derived parameters
+  for (t in 1:T){
+    N[t] <- sum(z[,t])                            # Population size at time t
+    EB[t] <- N[t] * gamma                         # Expected number of recruits
+    A[t] <- max(M - sum(a[,t]), 0.001)            # Bears available to be recruited
+    b[t] <- min(EB[t] / A[t], 0.999)              # Probability of being recruited
+  }
+
+  # Population model (individual-based model)
+  # Initial state
+  for (i in 1:M){
+    z[i,1] ~ dbern(psi)                           # Is a member of M alive?
+    a[i,1] <- z[i,1]                              # Recruited yet?
+    s[i,1] ~ dunif(xlims[1], xlims[2])            # Activity center, homogeneous
+    s[i,2] ~ dunif(ylims[1], ylims[2])
+
+    # Dynamics over time
+    for (t in 2:T){
+      z[i,t] ~ dbern(z[i,t-1] * phi + (1 - a[i,t-1]) * b[t-1])
+      a[i,t] <- max(z[i,1:t])
+    } #t
+  } #i
+
+  # Observation models
+  # Spatial capture-recapture data
+  for (i in 1:M){
+    for (j in 1:J){
+      d2[i,j] <- (s[i,1] - x[j,1])^2 + (s[i,2] - x[j,2])^2  # Distance squared
+      p[i,j] <- p0 * exp(-d2[i,j] / (2 * sigma^2))
+    } #j
+    for (j in 1:J){                               # Trap
+      for (k in 1:K){                             # Secondary occasions
+        # The years with SCR data
+        y[i,j,k,1] ~ dbern(p[i,j] * z[i,1])
+        y[i,j,k,2] ~ dbern(p[i,j] * z[i,3])
+        y[i,j,k,3] ~ dbern(p[i,j] * z[i,5])
+      } #k
+    } #j
+    zi[i] <- (sum(z[i,]) > 0)                     # Was this bear ever alive?
+  } #i
+
+  # Occupancy data
+  #for (j in 1:J){
+  #  for (k in 1:K){
+  #    o[j,k,1] ~ dbern(1-prod(1-p[,j] * z[,2]))
+  #    o[j,k,2] ~ dbern(1-prod(1-p[,j] * z[,4]))
+  #    o[j,k,3] ~ dbern(1-prod(1-p[,j] * z[,6]))
+  #  } #k
+  #} #j
+  N.ever <- sum(zi[])                             # Bears ever alive – superpopulation size
+}
+")
+
 # Initial values
 zin <- array(0, dim=c(dim(y)[1],6))
 zin[1:150,] <- 1
