@@ -307,12 +307,22 @@ print(out2, 3)
 # N[6]     65.840 9.073  48.475  66.000  84.000    FALSE 1 1.042    53
 
 # ~~~~ Fig. 21.3 ~~~~
-
+# plot the result to compare the model between occ and no occ data 
+par(mfrow=c(2,1))
 plot(y=out1$mean$N, x=1:6, ylim=c(0,100), type="b", pch=16, axes=FALSE,
      ylab="Population size (N)", xlab=NA)
 segments(1:6, out1$q2.5$N, 1:6, out1$q97.5$N)
 axis(1, at=1:6, labels = 2007:2012)
 axis(2, las=1)
+
+# plot the result without occupancy data
+plot(y=out2$mean$N, x=1:6, ylim=c(0,100), type="b", pch=16, axes=FALSE,
+     ylab="Population size (N)", xlab="without occ data")
+segments(1:6, out2$q2.5$N, 1:6, out2$q97.5$N)
+axis(1, at=1:6, labels = 2007:2012)
+axis(2, las=1)
+
+par(mfrow=c(1,1))
 
 # ~~~~ Fig. 21.4 ~~~~
 
@@ -326,6 +336,16 @@ lines(density(out1$sims.list$gamma), col=co[2] , lwd=2)
 legend('topleft', col=co, lwd=rep(2, 2), bty='n',
        legend=c(expression(paste('Adult survival (', phi, ')')),
                 expression(paste('Per capita recruitment (', gamma, ')'))))
+
+# without occupancy data
+plot(0, ylim=c(0, 13), xlim=c(0, 1), frame=FALSE, pch=NA,
+     ylab='Posterior density', xlab='Probability', las=1)
+lines(density(out2$sims.list$phi), col=co[1], lwd=2)
+lines(density(out2$sims.list$gamma), col=co[2] , lwd=2)
+legend('topleft', col=co, lwd=rep(2, 2), bty='n',
+       legend=c(expression(paste('Adult survival (', phi, ')')),
+                expression(paste('Per capita recruitment (', gamma, ')'))))
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Make Fig. 21.5
