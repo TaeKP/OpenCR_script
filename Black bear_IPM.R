@@ -167,6 +167,9 @@ ni <- 500; nb <- 200; nc <- 3; nt <- 1; na <- 200  # ~~~ for testing, 90 mins
 # Call JAGS from R (ART 1400 min) and check convergence
 out1 <- jags(jags.data, inits, parameters, "model1.txt", n.iter=ni, n.burnin=nb, n.chains=nc,
              n.thin=nt, n.adapt=na, parallel=TRUE)
+
+## Download the result of out1
+## load("black_bear.RData")
 traceplot(out1)
 
 # 21.6 Results
