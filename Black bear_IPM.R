@@ -235,6 +235,13 @@ out1 <- jags(jags.data, inits, parameters, "model1.txt", n.iter=ni, n.burnin=nb,
 ## load("black_bear.RData")
 traceplot(out1)
 
+# modified # fitted the model without occupancy data
+## Download the result of out2
+# load ("black_bear_no_occ.RData")
+out2 <- jags(jags.data, inits, parameters, "model2_removed_occ.txt", n.iter=ni, n.burnin=nb, n.chains=nc,
+             n.thin=nt, n.adapt=na, parallel=TRUE)
+traceplot(out2)
+
 # 21.6 Results
 # ============
 
@@ -281,6 +288,23 @@ print(out1, 3)
 # ... [output truncated] ...
 # z[199,6]    0.205  0.404    0.000    0.000    1.000     TRUE 1 1.001  2279
 # z[200,6]    0.182  0.386    0.000    0.000    1.000     TRUE 1 1.000  3000
+
+# ============
+# Checking the result without occupancy data
+print(out2, 3)
+
+#            mean    sd    2.5%     50%   97.5% overlap0 f  Rhat n.eff
+# psi       0.245 0.036   0.180   0.244   0.320    FALSE 1 1.006   383
+# phi       0.842 0.038   0.762   0.847   0.908    FALSE 1 1.056    40
+# gamma     0.212 0.035   0.147   0.211   0.284    FALSE 1 1.016   126
+# p0        0.115 0.007   0.101   0.115   0.130    FALSE 1 1.069    34
+# sigma     3.209 0.090   3.045   3.209   3.404    FALSE 1 1.048    46
+# N[1]     48.399 3.858  41.000  48.000  56.000    FALSE 1 1.023   150
+# N[2]     59.339 4.368  51.000  59.000  68.000    FALSE 1 1.024   117
+# N[3]     71.373 3.396  65.000  71.000  78.000    FALSE 1 1.037    71
+# N[4]     66.801 5.216  57.000  67.000  77.525    FALSE 1 1.033    67
+# N[5]     62.404 6.093  51.000  62.000  74.000    FALSE 1 1.061    38
+# N[6]     65.840 9.073  48.475  66.000  84.000    FALSE 1 1.042    53
 
 # ~~~~ Fig. 21.3 ~~~~
 
