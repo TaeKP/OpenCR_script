@@ -13,6 +13,106 @@ pR = 1 - E # Probability of remaining in study area
   
 phi = S - E # Apparent survival  
 
+#-------------------------------------------------------------------------------
+### Implement uncertainty on all parameters in simplest model ###
+# Originally code from Dr.Matt using "popbio" package
+#-------------------------------------------------------------------------------
+library(popbio)
+
+# obtaining the results from OpenCR including mean, SE, 95%CI
+# calculating the uncertainty (SD) from SE and sample size (n; number of observation; 3 years)
+# follows SD = SE * sqrt(n)
+
+# Initial population
+# mean = 81
+SE_pop <- 10
+n <- 3
+
+## we get: 
+SD_pop <- SE_pop*sqrt(n)
+# 17.32051
+
+## Growth rate (lambda)
+# mean = 1.16
+SE_growth_rate <- 0.12
+
+# we get: 
+SD_growth_rate <- SE_growth_rate*sqrt(n)
+# 0.2078461
+
+## Recruitment (f)
+# mean = 0.76
+SE_recruitment <- 0.12
+
+# we get: 
+SD_recruitment <- SE_recruitment*sqrt(n)
+# 0.2078461
+
+## Survival rate
+# mean = 0.49
+SE_survival_rate <- 0.091
+
+# we get: 
+SD_survival_rate <- SE_survival_rate*sqrt(n)
+# 0.1576166
+#-------------------------------------------------------------------------------
+# Parameters and uncertainty that should be in simplest model
+
+initial_population <- 81     # Initial population size
+initialN_sd <- 17
+
+growth_rate <- 1.16          # growth rate (lambda)
+growth_rate_sd <- 0.21
+
+#survival_rate <- 0.49        # True survival rate
+#survival_rate_sd <- 0.16
+
+carrying_capacity <- 100     # Carrying capacity of the environment
+years <- 10                  # Number of years to simulate
+simulations <- 1000          # Number of simulation runs; test
+#-------------------------------------------------------------------------------
+# Function to simulate growth_rate with stochasticity
+
+pva_simulation <- function(initial_population, growth_rate, carrying_capacity, years) {
+  population <- numeric(years)
+  #population[1] <- initial_population
+  population[1] <- rnorm(1, mean = initial_population, sd = initialN_sd) # we probably want this lognormal (or truncated at 0)
+  
+  for (year in 2:years) {
+    #stochastic_survival <- rnorm(1, mean = survival_rate, sd = 0.1) # Adding randomness
+    stochastic_survival <- rnorm(1, mean = growth_rate, sd = growth_rate_sd) # Adding randomness
+    
+    population[year] <- population[year - 1] * stochastic_survival
+    
+    population[year] <- ifelse(population[year] > carrying_capacity, carrying_capacity, population[year])
+    
+    if (population[year] < 1) { # Extinction event
+      population[year] <- 0
+      break
+    }
+  }
+  return(population)
+}
+#-------------------------------------------------------------------------------
+# Running the simulation multiple times
+results <- replicate(simulations, pva_simulation(initial_population, growth_rate, carrying_capacity, years))
+#results <- replicate(simulations, pva_simulation(initial_population, survival_rate, carrying_capacity, years))
+
+# Calculate the probability of extinction by the end of the simulation period
+(extinction_probability <- mean(results[years,] == 0))
+
+# Plotting results
+matplot(1:years, results, type = "l", lty = 1, col = rgb(0.1, 0.1, 0.1, 0.1),
+        xlab = "Year", ylab = "Population Size", main = "PVA Simulation")
+abline(h = carrying_capacity, col = "red", lty = 2)
+
+cat("Estimated Probability of Extinction:", extinction_probability, "\n")
+
+#-------------------------------------------------------------------------------
+# Now the uncertainty was implemented in the growth_rate in the simple model.
+# I'm not sure how should we proceed to apply the uncertainty with the rest of models?
+# i.e., 2-YEAR POPULATION MODEL, 1-YEAR POPULATION MODEL, and 1-YEAR POPULATION WITH 2 AGE CLASSES
+#-------------------------------------------------------------------------------
 
 # 2-YEAR POPULATION MODEL #
 #-------------------------#
