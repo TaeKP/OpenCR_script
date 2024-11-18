@@ -5,7 +5,7 @@
 S <- 0.49 # True survival (2 yrs)
 f <- 0.76 # Recruitment (2 yrs)
 lambda <- 1.16 # Population growth rate
-initN <- 100 # Initial population size
+initN <- 81 # Initial population size
 init_adultProp <- 0.4 # Proportion of initial population that is adult
 
 E = abs(lambda - S - f) # Emigration rate
@@ -119,11 +119,34 @@ cat("Estimated Probability of Extinction:", extinction_probability, "\n")
 
 # 2-YEAR POPULATION MODEL #
 #-------------------------#
+##Parameters and uncertainty
+
+initial_population <- 81     # Initial population size
+initialN_sd <- 78            # obtained from the uncertainty calculation
+
+growth_rate <- 1.16          # growth rate (lambda)
+growth_rate_sd <- 0.94
+
+recruitment_rate <- 0.76          # recruitment rate (f)
+recruitment_rate_sd <- 0.94
+
+survival_rate <- 0.49        # True survival rate
+survival_rate_sd <- 0.71
+
+## implement uncertainty to all parameters for the 2-YEAR POPULATION MODEL
+S <- rnorm(1, mean = survival_rate, sd = survival_rate_sd) # True survival (2 yrs)
+f <- rnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd) # Recruitment (2 yrs)
+lambda <- rnorm(1, mean = growth_rate, sd = growth_rate_sd) # Population growth rate
+initN <- 81 # Initial population size; based on open model (2023)
+E = abs(lambda - S - f) # Emigration rate
+
+## the result seems to be fluctuated (negative or positive projection) 
+## when we rerun the randomness for all parameters
+#-------------------------------------------------------------------------------
 
 n_years <- 10
 N <- c(initN, rep(NA, n_years - 1))
 Surv <- Rec <- Emi <- rep(NA, n_years)
-
 
 for(t in 3:length(N)){
   
