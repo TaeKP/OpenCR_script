@@ -20,54 +20,57 @@ phi = S - E # Apparent survival
 library(popbio)
 
 # obtaining the results from OpenCR including mean, SE, 95%CI
-# calculating the uncertainty (SD) from SE and sample size (n; number of observation; 3 years)
+# calculating the uncertainty (SD) from SE and sample size (n; number of observation)
+# using the new sample size, due to the open model was used the number of minimum/maximum individual
+# in the data set to calculate mean and SE, so in this case we used 34 or 61 to be a sample size.
+# individual identification = 34(2019); 55(2021); 61(2023)
 # follows SD = SE * sqrt(n)
 
 # Initial population
 # mean = 81
 SE_pop <- 10
-n <- 3
+n <- 61
 
 ## we get: 
-SD_pop <- SE_pop*sqrt(n)
-# 17.32051
+(SD_pop <- SE_pop*sqrt(n))
 
 ## Growth rate (lambda)
 # mean = 1.16
 SE_growth_rate <- 0.12
 
 # we get: 
-SD_growth_rate <- SE_growth_rate*sqrt(n)
-# 0.2078461
+(SD_growth_rate <- SE_growth_rate*sqrt(n))
 
 ## Recruitment (f)
 # mean = 0.76
 SE_recruitment <- 0.12
 
 # we get: 
-SD_recruitment <- SE_recruitment*sqrt(n)
-# 0.2078461
+(SD_recruitment <- SE_recruitment*sqrt(n))
 
 ## Survival rate
 # mean = 0.49
 SE_survival_rate <- 0.091
 
 # we get: 
-SD_survival_rate <- SE_survival_rate*sqrt(n)
-# 0.1576166
+(SD_survival_rate <- SE_survival_rate*sqrt(n))
+
 #-------------------------------------------------------------------------------
 # Parameters and uncertainty that should be in simplest model
 
 initial_population <- 81     # Initial population size
-initialN_sd <- 17
+initialN_sd <- 78            # obtained from the uncertainty calculation
 
 growth_rate <- 1.16          # growth rate (lambda)
-growth_rate_sd <- 0.21
+growth_rate_sd <- 0.94
+
+#recruitment_rate <- 0.76          # recruitment rate (f)
+#recruitment_rate_sd <- 0.94
 
 #survival_rate <- 0.49        # True survival rate
-#survival_rate_sd <- 0.16
+#survival_rate_sd <- 0.71
 
-carrying_capacity <- 100     # Carrying capacity of the environment
+carrying_capacity <- 140     # Carrying capacity of the environment; based on the suitable habitat and FC's home range size in KSRY
 years <- 10                  # Number of years to simulate
 simulations <- 1000          # Number of simulation runs; test
 #-------------------------------------------------------------------------------
