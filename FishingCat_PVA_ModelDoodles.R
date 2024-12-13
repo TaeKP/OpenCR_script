@@ -82,14 +82,13 @@ simulations <- 1000          # Number of simulation runs; test
 
 pva_simulation <- function(initial_population, growth_rate, carrying_capacity, years) {
   population <- numeric(years)
-  #population[1] <- initial_population
-  population[1] <- rnorm(1, mean = initial_population, sd = initialN_sd) # we probably want this lognormal (or truncated at 0)
+  population[1] <- truncnorm::rtruncnorm(1, mean = initial_population, sd = initialN_sd, a = 0) # we probably want this lognormal (or truncated at 0)
   
   for (year in 2:years) {
-    #stochastic_survival <- rnorm(1, mean = survival_rate, sd = 0.1) # Adding randomness
-    stochastic_survival <- rnorm(1, mean = growth_rate, sd = growth_rate_sd) # Adding randomness
     
-    population[year] <- population[year - 1] * stochastic_survival
+    stochastic_growthrate <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Adding randomness
+    
+    population[year] <- population[year - 1] * stochastic_growthrate
     
     population[year] <- ifelse(population[year] > carrying_capacity, carrying_capacity, population[year])
     
