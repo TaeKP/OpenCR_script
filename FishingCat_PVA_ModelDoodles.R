@@ -122,25 +122,12 @@ cat("Estimated Probability of Extinction:", extinction_probability, "\n")
 
 # 2-YEAR POPULATION MODEL #
 #-------------------------#
-##Parameters and uncertainty
-
-initial_population <- 81     # Initial population size
-initialN_sd <- 78            # obtained from the uncertainty calculation
-
-growth_rate <- 1.16          # growth rate (lambda)
-growth_rate_sd <- 0.94
-
-recruitment_rate <- 0.76          # recruitment rate (f)
-recruitment_rate_sd <- 0.94
-
-survival_rate <- 0.49        # True survival rate
-survival_rate_sd <- 0.71
 
 ## implement uncertainty to all parameters for the 2-YEAR POPULATION MODEL
-S <- rnorm(1, mean = survival_rate, sd = survival_rate_sd) # True survival (2 yrs)
-f <- rnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd) # Recruitment (2 yrs)
-lambda <- rnorm(1, mean = growth_rate, sd = growth_rate_sd) # Population growth rate
-initN <- 81 # Initial population size; based on open model (2023)
+S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
+f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
+lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Population growth rate
+initN <- initial_population # Initial population size; based on open model (2023)
 E = abs(lambda - S - f) # Emigration rate
 
 ## the result seems to be fluctuated (negative or positive projection) 
