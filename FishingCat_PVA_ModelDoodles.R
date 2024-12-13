@@ -32,43 +32,47 @@ SE_pop <- 10
 n <- 61
 
 ## we get: 
-(SD_pop <- SE_pop*sqrt(n))
+#(SD_pop <- SE_pop*sqrt(n))
+SD_pop <- SE_pop
 
 ## Growth rate (lambda)
 # mean = 1.16
 SE_growth_rate <- 0.12
 
 # we get: 
-(SD_growth_rate <- SE_growth_rate*sqrt(n))
+#(SD_growth_rate <- SE_growth_rate*sqrt(n))
+SD_growth_rate <- SE_growth_rate
 
 ## Recruitment (f)
 # mean = 0.76
 SE_recruitment <- 0.12
 
 # we get: 
-(SD_recruitment <- SE_recruitment*sqrt(n))
+#(SD_recruitment <- SE_recruitment*sqrt(n))
+SD_recruitment <- SD_recruitment
 
 ## Survival rate
 # mean = 0.49
 SE_survival_rate <- 0.091
 
 # we get: 
-(SD_survival_rate <- SE_survival_rate*sqrt(n))
+#(SD_survival_rate <- SE_survival_rate*sqrt(n))
+SD_survival_rate <- SE_survival_rate
 
 #-------------------------------------------------------------------------------
 # Parameters and uncertainty that should be in simplest model
 
 initial_population <- 81     # Initial population size
-initialN_sd <- 78            # obtained from the uncertainty calculation
+initialN_sd <- SD_pop            # obtained from the uncertainty calculation
 
 growth_rate <- 1.16          # growth rate (lambda)
-growth_rate_sd <- 0.94
+growth_rate_sd <- SD_growth_rate
 
-#recruitment_rate <- 0.76          # recruitment rate (f)
-#recruitment_rate_sd <- 0.94
+recruitment_rate <- 0.76          # recruitment rate (f)
+recruitment_rate_sd <- SD_recruitment
 
-#survival_rate <- 0.49        # True survival rate
-#survival_rate_sd <- 0.71
+survival_rate <- 0.49        # True survival rate
+survival_rate_sd <- SD_survival_rate
 
 carrying_capacity <- 140     # Carrying capacity of the environment; based on the suitable habitat and FC's home range size in KSRY
 years <- 10                  # Number of years to simulate
