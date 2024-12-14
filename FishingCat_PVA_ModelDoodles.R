@@ -32,43 +32,47 @@ SE_pop <- 10
 n <- 61
 
 ## we get: 
-(SD_pop <- SE_pop*sqrt(n))
+#(SD_pop <- SE_pop*sqrt(n))
+SD_pop <- SE_pop
 
 ## Growth rate (lambda)
 # mean = 1.16
 SE_growth_rate <- 0.12
 
 # we get: 
-(SD_growth_rate <- SE_growth_rate*sqrt(n))
+#(SD_growth_rate <- SE_growth_rate*sqrt(n))
+SD_growth_rate <- SE_growth_rate
 
 ## Recruitment (f)
 # mean = 0.76
 SE_recruitment <- 0.12
 
 # we get: 
-(SD_recruitment <- SE_recruitment*sqrt(n))
+#(SD_recruitment <- SE_recruitment*sqrt(n))
+SD_recruitment <- SD_recruitment
 
 ## Survival rate
 # mean = 0.49
 SE_survival_rate <- 0.091
 
 # we get: 
-(SD_survival_rate <- SE_survival_rate*sqrt(n))
+#(SD_survival_rate <- SE_survival_rate*sqrt(n))
+SD_survival_rate <- SE_survival_rate
 
 #-------------------------------------------------------------------------------
 # Parameters and uncertainty that should be in simplest model
 
 initial_population <- 81     # Initial population size
-initialN_sd <- 78            # obtained from the uncertainty calculation
+initialN_sd <- SD_pop            # obtained from the uncertainty calculation
 
 growth_rate <- 1.16          # growth rate (lambda)
-growth_rate_sd <- 0.94
+growth_rate_sd <- SD_growth_rate
 
-#recruitment_rate <- 0.76          # recruitment rate (f)
-#recruitment_rate_sd <- 0.94
+recruitment_rate <- 0.76          # recruitment rate (f)
+recruitment_rate_sd <- SD_recruitment
 
-#survival_rate <- 0.49        # True survival rate
-#survival_rate_sd <- 0.71
+survival_rate <- 0.49        # True survival rate
+survival_rate_sd <- SD_survival_rate
 
 carrying_capacity <- 140     # Carrying capacity of the environment; based on the suitable habitat and FC's home range size in KSRY
 years <- 10                  # Number of years to simulate
@@ -78,14 +82,13 @@ simulations <- 1000          # Number of simulation runs; test
 
 pva_simulation <- function(initial_population, growth_rate, carrying_capacity, years) {
   population <- numeric(years)
-  #population[1] <- initial_population
-  population[1] <- rnorm(1, mean = initial_population, sd = initialN_sd) # we probably want this lognormal (or truncated at 0)
+  population[1] <- truncnorm::rtruncnorm(1, mean = initial_population, sd = initialN_sd, a = 0) # we probably want this lognormal (or truncated at 0)
   
   for (year in 2:years) {
-    #stochastic_survival <- rnorm(1, mean = survival_rate, sd = 0.1) # Adding randomness
-    stochastic_survival <- rnorm(1, mean = growth_rate, sd = growth_rate_sd) # Adding randomness
     
-    population[year] <- population[year - 1] * stochastic_survival
+    stochastic_growthrate <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Adding randomness
+    
+    population[year] <- population[year - 1] * stochastic_growthrate
     
     population[year] <- ifelse(population[year] > carrying_capacity, carrying_capacity, population[year])
     
@@ -119,25 +122,12 @@ cat("Estimated Probability of Extinction:", extinction_probability, "\n")
 
 # 2-YEAR POPULATION MODEL #
 #-------------------------#
-##Parameters and uncertainty
-
-initial_population <- 81     # Initial population size
-initialN_sd <- 78            # obtained from the uncertainty calculation
-
-growth_rate <- 1.16          # growth rate (lambda)
-growth_rate_sd <- 0.94
-
-recruitment_rate <- 0.76          # recruitment rate (f)
-recruitment_rate_sd <- 0.94
-
-survival_rate <- 0.49        # True survival rate
-survival_rate_sd <- 0.71
 
 ## implement uncertainty to all parameters for the 2-YEAR POPULATION MODEL
-S <- rnorm(1, mean = survival_rate, sd = survival_rate_sd) # True survival (2 yrs)
-f <- rnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd) # Recruitment (2 yrs)
-lambda <- rnorm(1, mean = growth_rate, sd = growth_rate_sd) # Population growth rate
-initN <- 81 # Initial population size; based on open model (2023)
+S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
+f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
+lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Population growth rate
+initN <- initial_population # Initial population size; based on open model (2023)
 E = abs(lambda - S - f) # Emigration rate
 
 ## the result seems to be fluctuated (negative or positive projection) 
