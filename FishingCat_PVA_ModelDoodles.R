@@ -49,7 +49,7 @@ SE_recruitment <- 0.12
 
 # we get: 
 #(SD_recruitment <- SE_recruitment*sqrt(n))
-SD_recruitment <- SD_recruitment
+SD_recruitment <- SE_recruitment
 
 ## Survival rate
 # mean = 0.49
@@ -116,8 +116,6 @@ cat("Estimated Probability of Extinction:", extinction_probability, "\n")
 
 #-------------------------------------------------------------------------------
 # Now the uncertainty was implemented in the growth_rate in the simple model.
-# I'm not sure how should we proceed to apply the uncertainty with the rest of models?
-# i.e., 2-YEAR POPULATION MODEL, 1-YEAR POPULATION MODEL, and 1-YEAR POPULATION WITH 2 AGE CLASSES
 #-------------------------------------------------------------------------------
 
 # 2-YEAR POPULATION MODEL #
@@ -129,9 +127,6 @@ f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd,
 lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Population growth rate
 initN <- initial_population # Initial population size; based on open model (2023)
 E = abs(lambda - S - f) # Emigration rate
-
-## the result seems to be fluctuated (negative or positive projection) 
-## when we rerun the randomness for all parameters
 #-------------------------------------------------------------------------------
 
 n_years <- 10
@@ -148,6 +143,33 @@ for(t in 3:length(N)){
 
 cbind(N, Surv, Rec, Emi, Surv + Rec - Emi)
 
+#-------------------------------------------------------------------------------
+# adding the loop of simulation for 2 year model
+sim_2yrs <- sapply(1:simulations, function(x) {
+  
+  n_years <- 10
+  N <- c(initN, rep(NA, n_years - 1))
+  Surv <- Rec <- Emi <- rep(NA, n_years)
+  
+  S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) 
+  f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) 
+  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) 
+  initN <- initial_population 
+  E = abs(lambda - S - f) 
+  
+  for(t in 3:length(N)){
+    
+    N[t] <- N[t-2] * (S + f - E)
+    Surv[t] <- N[t-2]*S
+    Rec[t] <- N[t-2]*f
+    Emi[t] <- N[t-2]*E
+  }
+  N
+})
+
+View(sim_2yrs)
+
+#-------------------------------------------------------------------------------
 
 # 1-YEAR POPULATION MODEL #
 #-------------------------#
