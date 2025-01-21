@@ -229,7 +229,29 @@ cbind(N, Surv, Rec, Emi, Surv + Rec - Emi)
 cbind(N_alt, Surv_alt, Rec_alt, Emi_alt, Surv_alt + Rec_alt - Emi_alt)
 
 # --> These are now equivalent 2-year and 1-year interval models
+#-------------------------------------------------------------------------------
+# adding the loop of simulation for 1 year model
+sim_1yr <- sapply(1:simulations, function(x) {
+  
+  S1yr <- S / sqrt(lambda)
+  f1yr <- f / sqrt(lambda)
+  E1yr <- E / sqrt(lambda)
+  
+  N_alt <- c(initN, rep(NA, n_years - 1))
+  Surv_alt <- Rec_alt <- Emi_alt <- rep(NA, n_years)
+  
+  for(t in 2:length(N)){
+    
+    N_alt[t] <- N_alt[t-1] * (S1yr + f1yr - E1yr)
+    Surv_alt[t] <- N_alt[t-1]*S1yr
+    Rec_alt[t] <- N_alt[t-1]*f1yr
+    Emi_alt[t] <- N_alt[t-1]*E1yr
+  }
+  N_alt
+})
 
+View(sim_1yr)
+#-------------------------------------------------------------------------------
 
 # 1-YEAR POPULATION WITH 2 AGE CLASSES #
 #--------------------------------------#
