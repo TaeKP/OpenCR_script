@@ -185,7 +185,7 @@ results_2yrs <- replicate(simulations, pva_simulation_2yrs(initN, growth_rate, s
 View(results_2yrs)
 
 # Calculate the probability of extinction by the end of the simulation period
-(extinction_probability_2yr <- mean(results_2yrs[n_years-1,] == 0))
+(extinction_probability_2yrs <- mean(results_2yrs[n_years-1,] == 0))
 
 #-------------------------------------------------------------------------------
 ## Alternative way to simulate data
@@ -274,7 +274,54 @@ cbind(N, Surv, Rec, Emi, Surv + Rec - Emi)
 cbind(N_alt, Surv_alt, Rec_alt, Emi_alt, Surv_alt + Rec_alt - Emi_alt)
 
 # --> These are now equivalent 2-year and 1-year interval models
+
 #-------------------------------------------------------------------------------
+## Function to simulate the stochasticity, equivalent to the function "pva simulation()".
+
+pva_simulation_1yr <- function(initN, growth_rate, survival_rate, recruitment_rate, carrying_capacity, n_years) {
+  
+  N_alt <- c(initN, rep(NA, n_years - 1))
+  Surv_alt <- Rec_alt <- Emi_alt <- rep(NA, n_years)
+  
+  #N_alt[1] <- truncnorm::rtruncnorm(1, mean = initN, sd = initialN_sd, a = 0)  # in case we need the random number of initN
+  
+  for(t in 2:length(N)){
+    
+    S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
+    f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
+    lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Population growth rate
+    E = abs(lambda - S - f) # Emigration rate
+    
+    S1yr <- S / sqrt(lambda)
+    f1yr <- f / sqrt(lambda)
+    E1yr <- E / sqrt(lambda)
+    
+    N_alt[t] <- N_alt[t-1] * (S1yr + f1yr - E1yr)
+    Surv_alt[t] <- N_alt[t-1]*S1yr
+    Rec_alt[t] <- N_alt[t-1]*f1yr
+    Emi_alt[t] <- N_alt[t-1]*E1yr
+    
+    N_alt[t] <- ifelse(N_alt[t] > carrying_capacity, carrying_capacity, N_alt[t])
+    
+    if (N_alt[t] < 1) { # Extinction event
+      N_alt[t] <- 0
+      break
+    }
+  }
+  return(N_alt)
+}
+
+#-------------------------------------------------------------------------------
+# Running the simulation multiple times
+results_1yr <- replicate(simulations, pva_simulation_1yr(initN, growth_rate, survival_rate, recruitment_rate, carrying_capacity, n_years))
+
+View(results_1yr)
+
+# Calculate the probability of extinction by the end of the simulation period
+(extinction_probability_1yr <- mean(results_1yr[n_years,] == 0))
+
+#-------------------------------------------------------------------------------
+## Alternative way to simulate data
 # adding the loop of simulation for 1 year model
 sim_1yr <- sapply(1:simulations, function(x) {
   
