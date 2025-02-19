@@ -133,7 +133,7 @@ pva_simulation_2yrs <- function(initN, growth_rate, survival_rate, recruitment_r
   
   S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
   f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Population growth rate
+  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = S + f) # Population growth rate
   E = abs(lambda - S - f) # Emigration rate
   
   for(t in 3:length(N)){
@@ -218,7 +218,7 @@ pva_simulation_1yr <- function(initN, growth_rate, survival_rate, recruitment_ra
   
   S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
   f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Population growth rate
+  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = S + f) # Population growth rate
   E = abs(lambda - S - f) # Emigration rate
   
   for(t in 2:length(N)){
@@ -259,14 +259,17 @@ results_1yr <- replicate(simulations, pva_simulation_1yr(initN, growth_rate, sur
 
 pva_simulation_age_str <- function(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years) {
   
-  N_mat2 <- matrix(NA, nrow = 2, ncol = n_years)
-  N_mat2[,1] <- c(1 - init_adultProp, init_adultProp)*initN
-  
   S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
   f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Population growth rate
+  
+  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = S + f) # Population growth rate
+  
   E = abs(lambda - S - f) # Emigration rate
+  
   init_adultProp <- truncnorm::rtruncnorm(1, mean = init_adultProp_mean, sd = init_adultProp_SD, a = 0, b = 1)
+  
+  N_mat2 <- matrix(NA, nrow = 2, ncol = n_years)
+  N_mat2[,1] <- c(1 - init_adultProp, init_adultProp)*initN
   
   S1yr <- S / sqrt(lambda)
   f1yr <- f / sqrt(lambda)
