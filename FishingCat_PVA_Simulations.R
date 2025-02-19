@@ -289,7 +289,9 @@ pva_simulation_age_str <- function(initN, growth_rate, survival_rate, recruitmen
     # Project
     N_mat2[, t] <- A %*% N_mat2[, t-1]
     
-    N_mat2[,t] <- ifelse(sum(N_mat2[,t]) > carrying_capacity, N_mat2[,t-1], N_mat2[,t])
+    if(sum(N_mat2[, t]) > carrying_capacity){
+      N_mat2[, t] <- N_mat2[, t-1]
+    }
     
     if (N_mat2[t] < 1) { # Extinction event
       N_mat2[t] <- 0
