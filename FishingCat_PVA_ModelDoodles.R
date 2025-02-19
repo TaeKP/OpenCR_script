@@ -5,136 +5,22 @@
 S <- 0.49 # True survival (2 yrs)
 f <- 0.76 # Recruitment (2 yrs)
 lambda <- 1.16 # Population growth rate
-initN <- 81 # Initial population size
-#init_adultProp <- 0.4 # Proportion of initial population that is adult
-init_adultProp_mean <- 0.09 # Mean of Proportion of initial population that is adult; 3 years
-init_adultProp_SD <- 0.03 # SD of Proportion of initial population that is adult
-# init_adultProp_2023 <- 0.09 # Mean of Proportion of initial population that is adult; year 2023
+initN <- 100 # Initial population size
+init_adultProp <- 0.4 # Proportion of initial population that is adult
 
 E = abs(lambda - S - f) # Emigration rate
 pR = 1 - E # Probability of remaining in study area
-  
+
 phi = S - E # Apparent survival  
 
-#-------------------------------------------------------------------------------
-### Implement uncertainty on all parameters in simplest model ###
-# Originally code from Dr.Matt using "popbio" package
-#-------------------------------------------------------------------------------
-library(popbio)
-
-# obtaining the results from OpenCR including mean, SE, 95%CI
-# calculating the uncertainty (SD) from SE and sample size (n; number of observation)
-# using the new sample size, due to the open model was used the number of minimum/maximum individual
-# in the data set to calculate mean and SE, so in this case we used 34 or 61 to be a sample size.
-# individual identification = 34(2019); 55(2021); 61(2023)
-# follows SD = SE * sqrt(n)
-
-# Initial population
-# mean = 81
-SE_pop <- 10
-n <- 61
-
-## we get: 
-#(SD_pop <- SE_pop*sqrt(n))
-SD_pop <- SE_pop
-
-## Growth rate (lambda)
-# mean = 1.16
-SE_growth_rate <- 0.12
-
-# we get: 
-#(SD_growth_rate <- SE_growth_rate*sqrt(n))
-SD_growth_rate <- SE_growth_rate
-
-## Recruitment (f)
-# mean = 0.76
-SE_recruitment <- 0.12
-
-# we get: 
-#(SD_recruitment <- SE_recruitment*sqrt(n))
-SD_recruitment <- SE_recruitment
-
-## Survival rate
-# mean = 0.49
-SE_survival_rate <- 0.091
-
-# we get: 
-#(SD_survival_rate <- SE_survival_rate*sqrt(n))
-SD_survival_rate <- SE_survival_rate
-
-#-------------------------------------------------------------------------------
-# Parameters and uncertainty that should be in simplest model
-
-initial_population <- 81     # Initial population size
-initialN_sd <- SD_pop            # obtained from the uncertainty calculation
-
-growth_rate <- 1.16          # growth rate (lambda)
-growth_rate_sd <- SD_growth_rate
-
-recruitment_rate <- 0.76          # recruitment rate (f)
-recruitment_rate_sd <- SD_recruitment
-
-survival_rate <- 0.49        # True survival rate
-survival_rate_sd <- SD_survival_rate
-
-carrying_capacity <- 140     # Carrying capacity of the environment; based on the suitable habitat and FC's home range size in KSRY
-years <- 10                  # Number of years to simulate
-simulations <- 1000          # Number of simulation runs; test
-#-------------------------------------------------------------------------------
-# Function to simulate growth_rate with stochasticity
-
-pva_simulation <- function(initial_population, growth_rate, carrying_capacity, years) {
-  population <- numeric(years)
-  population[1] <- truncnorm::rtruncnorm(1, mean = initial_population, sd = initialN_sd, a = 0) # we probably want this lognormal (or truncated at 0)
-  
-  for (year in 2:years) {
-    
-    stochastic_growthrate <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Adding randomness
-    
-    population[year] <- population[year - 1] * stochastic_growthrate
-    
-    population[year] <- ifelse(population[year] > carrying_capacity, carrying_capacity, population[year])
-    
-    if (population[year] < 1) { # Extinction event
-      population[year] <- 0
-      break
-    }
-  }
-  return(population)
-}
-#-------------------------------------------------------------------------------
-# Running the simulation multiple times
-results <- replicate(simulations, pva_simulation(initial_population, growth_rate, carrying_capacity, years))
-#results <- replicate(simulations, pva_simulation(initial_population, survival_rate, carrying_capacity, years))
-
-# Calculate the probability of extinction by the end of the simulation period
-(extinction_probability <- mean(results[years,] == 0))
-
-# Plotting results
-matplot(1:years, results, type = "l", lty = 1, col = rgb(0.1, 0.1, 0.1, 0.1),
-        xlab = "Year", ylab = "Population Size", main = "PVA Simulation")
-abline(h = carrying_capacity, col = "red", lty = 2)
-
-cat("Estimated Probability of Extinction:", extinction_probability, "\n")
-
-#-------------------------------------------------------------------------------
-# Now the uncertainty was implemented in the growth_rate in the simple model.
-#-------------------------------------------------------------------------------
 
 # 2-YEAR POPULATION MODEL #
 #-------------------------#
 
-## implement uncertainty to all parameters for the 2-YEAR POPULATION MODEL
-S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
-f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Population growth rate
-initN <- initial_population # Initial population size; based on open model (2023)
-E = abs(lambda - S - f) # Emigration rate
-#-------------------------------------------------------------------------------
-
 n_years <- 10
 N <- c(initN, rep(NA, n_years - 1))
 Surv <- Rec <- Emi <- rep(NA, n_years)
+
 
 for(t in 3:length(N)){
   
@@ -146,78 +32,6 @@ for(t in 3:length(N)){
 
 cbind(N, Surv, Rec, Emi, Surv + Rec - Emi)
 
-#-------------------------------------------------------------------------------
-## Function to simulate the stochasticity, equivalent to the function "pva simulation()".
-
-pva_simulation_2yrs <- function(initN, growth_rate, survival_rate, recruitment_rate, carrying_capacity, n_years) {
-  
-  N <- c(initN, rep(NA, n_years - 1))
-  Surv <- Rec <- Emi <- rep(NA, n_years)
-  
-  #N[1] <- truncnorm::rtruncnorm(1, mean = initN, sd = initialN_sd, a = 0)  # in case we need the random number of initN
-  
-  for(t in 3:length(N)){
-    
-    S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
-    f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-    lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Population growth rate
-    E = abs(lambda - S - f) # Emigration rate
-    
-    N[t] <- N[t-2] * (S + f - E)
-    Surv[t] <- N[t-2]*S
-    Rec[t] <- N[t-2]*f
-    Emi[t] <- N[t-2]*E
-    
-    N[t] <- ifelse(N[t] > carrying_capacity, carrying_capacity, N[t])
-    
-    for(j in 3:length(N)){
-      
-      if (N[j-2] < 1) { # Extinction event
-        N[j-2] <- 0
-      }
-      break
-    }
-  }
-  return(N)
-}
-
-#-------------------------------------------------------------------------------
-# Running the simulation multiple times
-results_2yrs <- replicate(simulations, pva_simulation_2yrs(initN, growth_rate, survival_rate, recruitment_rate, carrying_capacity, n_years))
-
-View(results_2yrs)
-
-# Calculate the probability of extinction by the end of the simulation period
-(extinction_probability_2yrs <- mean(results_2yrs[n_years-1,] == 0))
-
-#-------------------------------------------------------------------------------
-## Alternative way to simulate data
-# adding the loop of simulation for 2 year model
-sim_2yrs <- sapply(1:simulations, function(x) {
-  
-  n_years <- 10
-  N <- c(initN, rep(NA, n_years - 1))
-  Surv <- Rec <- Emi <- rep(NA, n_years)
-  
-  S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) 
-  f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) 
-  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) 
-  initN <- initial_population 
-  E = abs(lambda - S - f) 
-  
-  for(t in 3:length(N)){
-    
-    N[t] <- N[t-2] * (S + f - E)
-    Surv[t] <- N[t-2]*S
-    Rec[t] <- N[t-2]*f
-    Emi[t] <- N[t-2]*E
-  }
-  N
-})
-
-View(sim_2yrs)
-
-#-------------------------------------------------------------------------------
 
 # 1-YEAR POPULATION MODEL #
 #-------------------------#
@@ -278,80 +92,9 @@ cbind(N_alt, Surv_alt, Rec_alt, Emi_alt, Surv_alt + Rec_alt - Emi_alt)
 
 # --> These are now equivalent 2-year and 1-year interval models
 
-#-------------------------------------------------------------------------------
-## Function to simulate the stochasticity, equivalent to the function "pva simulation()".
-
-pva_simulation_1yr <- function(initN, growth_rate, survival_rate, recruitment_rate, carrying_capacity, n_years) {
-  
-  N_alt <- c(initN, rep(NA, n_years - 1))
-  Surv_alt <- Rec_alt <- Emi_alt <- rep(NA, n_years)
-  
-  #N_alt[1] <- truncnorm::rtruncnorm(1, mean = initN, sd = initialN_sd, a = 0)  # in case we need the random number of initN
-  
-  for(t in 2:length(N)){
-    
-    S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
-    f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-    lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Population growth rate
-    E = abs(lambda - S - f) # Emigration rate
-    
-    S1yr <- S / sqrt(lambda)
-    f1yr <- f / sqrt(lambda)
-    E1yr <- E / sqrt(lambda)
-    
-    N_alt[t] <- N_alt[t-1] * (S1yr + f1yr - E1yr)
-    Surv_alt[t] <- N_alt[t-1]*S1yr
-    Rec_alt[t] <- N_alt[t-1]*f1yr
-    Emi_alt[t] <- N_alt[t-1]*E1yr
-    
-    N_alt[t] <- ifelse(N_alt[t] > carrying_capacity, carrying_capacity, N_alt[t])
-    
-    if (N_alt[t] < 1) { # Extinction event
-      N_alt[t] <- 0
-      break
-    }
-  }
-  return(N_alt)
-}
-
-#-------------------------------------------------------------------------------
-# Running the simulation multiple times
-results_1yr <- replicate(simulations, pva_simulation_1yr(initN, growth_rate, survival_rate, recruitment_rate, carrying_capacity, n_years))
-
-View(results_1yr)
-
-# Calculate the probability of extinction by the end of the simulation period
-(extinction_probability_1yr <- mean(results_1yr[n_years,] == 0))
-
-#-------------------------------------------------------------------------------
-## Alternative way to simulate data
-# adding the loop of simulation for 1 year model
-sim_1yr <- sapply(1:simulations, function(x) {
-  
-  S1yr <- S / sqrt(lambda)
-  f1yr <- f / sqrt(lambda)
-  E1yr <- E / sqrt(lambda)
-  
-  N_alt <- c(initN, rep(NA, n_years - 1))
-  Surv_alt <- Rec_alt <- Emi_alt <- rep(NA, n_years)
-  
-  for(t in 2:length(N)){
-    
-    N_alt[t] <- N_alt[t-1] * (S1yr + f1yr - E1yr)
-    Surv_alt[t] <- N_alt[t-1]*S1yr
-    Rec_alt[t] <- N_alt[t-1]*f1yr
-    Emi_alt[t] <- N_alt[t-1]*E1yr
-  }
-  N_alt
-})
-
-View(sim_1yr)
-#-------------------------------------------------------------------------------
 
 # 1-YEAR POPULATION WITH 2 AGE CLASSES #
 #--------------------------------------#
-# Proportion of initial population that is adult
-init_adultProp <- truncnorm::rtruncnorm(1, mean = init_adultProp_mean, sd = init_adultProp_SD, a = 0, b = 1)
 
 # Projection matrix (1 = juvenile, < 1 year old; 2 = adult, > 1 year old)
 A <- matrix(NA, nrow = 2, ncol = 2)
@@ -422,56 +165,6 @@ N_mat2
 cbind(colSums(N_mat2), N_alt) 
 # --> There we go, same as the non-structured model now
 
-#-------------------------------------------------------------------------------
-## Function to simulate the stochasticity, equivalent to the function "pva simulation()".
-
-pva_simulation_age_str <- function(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years) {
-  
-  N_mat2 <- matrix(NA, nrow = 2, ncol = n_years)
-  N_mat2[,1] <- c(1 - init_adultProp, init_adultProp)*initN
-  
-  for(t in 2:length(N)){
-    
-    S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
-    f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-    lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Population growth rate
-    E = abs(lambda - S - f) # Emigration rate
-    init_adultProp <- truncnorm::rtruncnorm(1, mean = init_adultProp_mean, sd = init_adultProp_SD, a = 0, b = 1)
-    
-    S1yr <- S / sqrt(lambda)
-    f1yr <- f / sqrt(lambda)
-    E1yr <- E / sqrt(lambda)
-    
-    # Projection matrix (1 = juvenile, < 1 year old; 2 = adult, > 1 year old)
-    A <- matrix(NA, nrow = 2, ncol = 2)
-    A[1, 1] <- 0 # Juveniles producing juveniles within 1 year
-    A[2, 1] <- S1yr - E1yr # Juvenile becoming adults within 1 year
-    A[2, 2] <- S1yr - E1yr # Adults remaining alive (& in study area) within 1 year
-    A[1, 2] <- f1yr # Adults producing juveniles within 1 year
-    
-    # Calculate "per adult recruitment rate" for time-step
-    current_adultProp <- N_mat2[2, t-1] / sum(N_mat2[, t-1])
-    f1yr_ad <- f1yr /  current_adultProp
-    A[1, 2] <- f1yr_ad
-    
-    # Project
-    N_mat2[, t] <- A %*% N_mat2[, t-1]
-    
-    N_mat2[t] <- ifelse(N_mat2[t] > carrying_capacity, carrying_capacity, N_mat2[t])
-    
-    if (N_mat2[t] < 1) { # Extinction event
-      N_mat2[t] <- 0
-      break
-    }
-  }
-  return(N_mat2)
-}
-
-#-------------------------------------------------------------------------------
-# Running the simulation multiple times
-(results_age_str <- replicate(simulations, pva_simulation_age_str(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years)) )
-
-#-------------------------------------------------------------------------------
 # Further thoughts: 
 # -> We should probably compare PVAs done with i) two-year unstructured model, 
 #    ii) one-year unstructured model, and iii) one-year age-structured model
