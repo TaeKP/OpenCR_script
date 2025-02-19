@@ -156,12 +156,12 @@ pva_simulation_2yrs <- function(initN, growth_rate, survival_rate, recruitment_r
   
   #N[1] <- truncnorm::rtruncnorm(1, mean = initN, sd = initialN_sd, a = 0)  # in case we need the random number of initN
   
+  S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
+  f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
+  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Population growth rate
+  E = abs(lambda - S - f) # Emigration rate
+  
   for(t in 3:length(N)){
-    
-    S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
-    f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-    lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Population growth rate
-    E = abs(lambda - S - f) # Emigration rate
     
     N[t] <- N[t-2] * (S + f - E)
     Surv[t] <- N[t-2]*S
@@ -190,32 +190,6 @@ View(results_2yrs)
 # Calculate the probability of extinction by the end of the simulation period
 (extinction_probability_2yrs <- mean(results_2yrs[n_years-1,] == 0))
 
-#-------------------------------------------------------------------------------
-## Alternative way to simulate data
-# adding the loop of simulation for 2 year model
-sim_2yrs <- sapply(1:simulations, function(x) {
-  
-  n_years <- 10
-  N <- c(initN, rep(NA, n_years - 1))
-  Surv <- Rec <- Emi <- rep(NA, n_years)
-  
-  S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) 
-  f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) 
-  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) 
-  initN <- initial_population 
-  E = abs(lambda - S - f) 
-  
-  for(t in 3:length(N)){
-    
-    N[t] <- N[t-2] * (S + f - E)
-    Surv[t] <- N[t-2]*S
-    Rec[t] <- N[t-2]*f
-    Emi[t] <- N[t-2]*E
-  }
-  N
-})
-
-View(sim_2yrs)
 
 #-------------------------------------------------------------------------------
 
@@ -277,6 +251,8 @@ cbind(N, Surv, Rec, Emi, Surv + Rec - Emi)
 cbind(N_alt, Surv_alt, Rec_alt, Emi_alt, Surv_alt + Rec_alt - Emi_alt)
 
 # --> These are now equivalent 2-year and 1-year interval models
+# NOTE: This comparison only worked for the original model doodles that did NOT simulate demographic parameters from distributions. 
+
 
 #-------------------------------------------------------------------------------
 ## Function to simulate the stochasticity, equivalent to the function "pva simulation()".
@@ -288,12 +264,12 @@ pva_simulation_1yr <- function(initN, growth_rate, survival_rate, recruitment_ra
   
   #N_alt[1] <- truncnorm::rtruncnorm(1, mean = initN, sd = initialN_sd, a = 0)  # in case we need the random number of initN
   
+  S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
+  f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
+  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Population growth rate
+  E = abs(lambda - S - f) # Emigration rate
+  
   for(t in 2:length(N)){
-    
-    S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
-    f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-    lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Population growth rate
-    E = abs(lambda - S - f) # Emigration rate
     
     S1yr <- S / sqrt(lambda)
     f1yr <- f / sqrt(lambda)
@@ -323,30 +299,6 @@ View(results_1yr)
 # Calculate the probability of extinction by the end of the simulation period
 (extinction_probability_1yr <- mean(results_1yr[n_years,] == 0))
 
-#-------------------------------------------------------------------------------
-## Alternative way to simulate data
-# adding the loop of simulation for 1 year model
-sim_1yr <- sapply(1:simulations, function(x) {
-  
-  S1yr <- S / sqrt(lambda)
-  f1yr <- f / sqrt(lambda)
-  E1yr <- E / sqrt(lambda)
-  
-  N_alt <- c(initN, rep(NA, n_years - 1))
-  Surv_alt <- Rec_alt <- Emi_alt <- rep(NA, n_years)
-  
-  for(t in 2:length(N)){
-    
-    N_alt[t] <- N_alt[t-1] * (S1yr + f1yr - E1yr)
-    Surv_alt[t] <- N_alt[t-1]*S1yr
-    Rec_alt[t] <- N_alt[t-1]*f1yr
-    Emi_alt[t] <- N_alt[t-1]*E1yr
-  }
-  N_alt
-})
-
-View(sim_1yr)
-#-------------------------------------------------------------------------------
 
 # 1-YEAR POPULATION WITH 2 AGE CLASSES #
 #--------------------------------------#
@@ -430,17 +382,17 @@ pva_simulation_age_str <- function(initN, growth_rate, survival_rate, recruitmen
   N_mat2 <- matrix(NA, nrow = 2, ncol = n_years)
   N_mat2[,1] <- c(1 - init_adultProp, init_adultProp)*initN
   
+  S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
+  f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
+  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Population growth rate
+  E = abs(lambda - S - f) # Emigration rate
+  init_adultProp <- truncnorm::rtruncnorm(1, mean = init_adultProp_mean, sd = init_adultProp_SD, a = 0, b = 1)
+  
+  S1yr <- S / sqrt(lambda)
+  f1yr <- f / sqrt(lambda)
+  E1yr <- E / sqrt(lambda)
+  
   for(t in 2:length(N)){
-    
-    S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
-    f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-    lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Population growth rate
-    E = abs(lambda - S - f) # Emigration rate
-    init_adultProp <- truncnorm::rtruncnorm(1, mean = init_adultProp_mean, sd = init_adultProp_SD, a = 0, b = 1)
-    
-    S1yr <- S / sqrt(lambda)
-    f1yr <- f / sqrt(lambda)
-    E1yr <- E / sqrt(lambda)
     
     # Projection matrix (1 = juvenile, < 1 year old; 2 = adult, > 1 year old)
     A <- matrix(NA, nrow = 2, ncol = 2)
