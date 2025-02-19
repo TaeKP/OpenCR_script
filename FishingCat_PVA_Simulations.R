@@ -298,3 +298,51 @@ pva_simulation_age_str <- function(initN, growth_rate, survival_rate, recruitmen
 #-------------------------------------------------------------------------------
 # Running the simulation multiple times
 (results_age_str <- replicate(simulations, pva_simulation_age_str(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years)) )
+
+
+# VISUAL COMPARISON #
+#-------------------#
+
+library(magrittr)
+library(ggplot2)
+
+# Write results as data frames
+
+sim_1 <- reshape2::melt(results) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "2-year, lambda only",
+                Year = (Year*2)-1) %>%
+  dplyr::filter(Year <= years)
+
+sim_2 <- reshape2::melt(results_2yrs) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "2-year, vital rates") %>%
+  dplyr::filter((Year %% 2) != 0) # Drop even years that are "skipped" by model
+
+sim_3 <- reshape2::melt(results_1yr) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "1-year, vital rates")
+
+sim_4 <- reshape2::melt(apply(results_age_str, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "1-year, vital rates & age structure")
+
+## Combine results and summarise
+simSummary <- rbind(sim_1, sim_2, sim_3, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
