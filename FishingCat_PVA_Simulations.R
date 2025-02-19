@@ -81,6 +81,10 @@ carrying_capacity <- 140     # Carrying capacity of the environment; based on th
 years <- 10                  # Number of years to simulate
 simulations <- 1000          # Number of simulation runs; test
 
+test_contantValues <- FALSE
+if(test_contantValues){
+  initialN_sd <- growth_rate_sd <- recruitment_rate_sd <- survival_rate_sd <- 0
+}
 
 # 2-YEAR POPULATION MODEL (Population growth rate only) #
 #-------------------------------------------------------#
