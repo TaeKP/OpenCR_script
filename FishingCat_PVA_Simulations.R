@@ -90,7 +90,8 @@ simulations <- 1000          # Number of simulation runs; test
 
 pva_simulation <- function(initial_population, growth_rate, carrying_capacity, years) {
   population <- numeric(years)
-  population[1] <- truncnorm::rtruncnorm(1, mean = initial_population, sd = initialN_sd, a = 0) # we probably want this lognormal (or truncated at 0)
+  #population[1] <- truncnorm::rtruncnorm(1, mean = initial_population, sd = initialN_sd, a = 0) # we probably want this lognormal (or truncated at 0)
+  population[1] <- initial_population
   
   for (year in 2:years) {
     
