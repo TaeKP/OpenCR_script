@@ -68,13 +68,13 @@ SD_survival_rate <- SE_survival_rate
 initial_population <- 81     # Initial population size
 initialN_sd <- SD_pop            # obtained from the uncertainty calculation
 
-growth_rate <- 1.16          # growth rate (lambda)
+growth_rate <- lambda          # growth rate (lambda)
 growth_rate_sd <- SD_growth_rate
 
-recruitment_rate <- 0.76          # recruitment rate (f)
+recruitment_rate <- f          # recruitment rate (f)
 recruitment_rate_sd <- SD_recruitment
 
-survival_rate <- 0.49        # True survival rate
+survival_rate <- S        # True survival rate
 survival_rate_sd <- SD_survival_rate
 
 carrying_capacity <- 140     # Carrying capacity of the environment; based on the suitable habitat and FC's home range size in KSRY
