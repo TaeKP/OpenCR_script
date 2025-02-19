@@ -99,7 +99,8 @@ pva_simulation <- function(initial_population, growth_rate, carrying_capacity, y
     
     population[year] <- population[year - 1] * stochastic_growthrate
     
-    population[year] <- ifelse(population[year] > carrying_capacity, carrying_capacity, population[year])
+    #population[year] <- ifelse(population[year] > carrying_capacity, carrying_capacity, population[year])
+    population[year] <- ifelse(population[year] > carrying_capacity, population[year-1], population[year])
     
     if (population[year] < 1) { # Extinction event
       population[year] <- 0
@@ -142,7 +143,8 @@ pva_simulation_2yrs <- function(initN, growth_rate, survival_rate, recruitment_r
     Rec[t] <- N[t-2]*f
     Emi[t] <- N[t-2]*E
     
-    N[t] <- ifelse(N[t] > carrying_capacity, carrying_capacity, N[t])
+    #N[t] <- ifelse(N[t] > carrying_capacity, carrying_capacity, N[t])
+    N[t] <- ifelse(N[t] > carrying_capacity, N[t-2], N[t])
     
     for(j in 3:length(N)){
       
@@ -230,7 +232,8 @@ pva_simulation_1yr <- function(initN, growth_rate, survival_rate, recruitment_ra
     Rec_alt[t] <- N_alt[t-1]*f1yr
     Emi_alt[t] <- N_alt[t-1]*E1yr
     
-    N_alt[t] <- ifelse(N_alt[t] > carrying_capacity, carrying_capacity, N_alt[t])
+    #N_alt[t] <- ifelse(N_alt[t] > carrying_capacity, carrying_capacity, N_alt[t])
+    N_alt[t] <- ifelse(N_alt[t] > carrying_capacity, N_alt[t-1], N_alt[t])
     
     if (N_alt[t] < 1) { # Extinction event
       N_alt[t] <- 0
@@ -286,7 +289,7 @@ pva_simulation_age_str <- function(initN, growth_rate, survival_rate, recruitmen
     # Project
     N_mat2[, t] <- A %*% N_mat2[, t-1]
     
-    N_mat2[t] <- ifelse(N_mat2[t] > carrying_capacity, carrying_capacity, N_mat2[t])
+    N_mat2[,t] <- ifelse(sum(N_mat2[,t]) > carrying_capacity, N_mat2[,t-1], N_mat2[,t])
     
     if (N_mat2[t] < 1) { # Extinction event
       N_mat2[t] <- 0
