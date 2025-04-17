@@ -127,6 +127,8 @@ results <- replicate(simulations, pva_simulation(initial_population, growth_rate
 #-------------------------------------------------------------------------------
 ## Function to simulate the stochasticity, equivalent to the function "pva simulation()".
 
+N <- c(initN, rep(NA, n_years - 1)) # due to error in 1-year model; need to add object "N" outside the simulation function
+
 pva_simulation_2yrs <- function(initN, growth_rate, survival_rate, recruitment_rate, carrying_capacity, n_years) {
   
   N <- c(initN, rep(NA, n_years - 1))
