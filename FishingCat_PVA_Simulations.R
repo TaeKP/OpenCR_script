@@ -77,7 +77,7 @@ survival_rate <- S        # True survival rate
 survival_rate_sd <- SD_survival_rate
 
 carrying_capacity <- 140     # Carrying capacity of the environment; based on the suitable habitat and FC's home range size in KSRY
-years <- 10                  # Number of years to simulate
+n_years <- 10                  # Number of years to simulate
 simulations <- 1000          # Number of simulation runs; test
 
 test_contantValues <- FALSE
@@ -91,12 +91,12 @@ if(test_contantValues){
 #-------------------------------------------------------------------------------
 # Function to simulate growth_rate with stochasticity
 
-pva_simulation <- function(initial_population, growth_rate, carrying_capacity, years) {
-  population <- numeric(years)
+pva_simulation <- function(initial_population, growth_rate, carrying_capacity, n_years) {
+  population <- numeric(n_years)
   #population[1] <- truncnorm::rtruncnorm(1, mean = initial_population, sd = initialN_sd, a = 0) # we probably want this lognormal (or truncated at 0)
   population[1] <- initial_population
   
-  for (year in 2:years) {
+  for (year in 2:n_years) {
     
     stochastic_growthrate <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Adding randomness
     
@@ -114,10 +114,10 @@ pva_simulation <- function(initial_population, growth_rate, carrying_capacity, y
 }
 #-------------------------------------------------------------------------------
 # Running the simulation multiple times
-results <- replicate(simulations, pva_simulation(initial_population, growth_rate, carrying_capacity, years))
+results <- replicate(simulations, pva_simulation(initial_population, growth_rate, carrying_capacity, n_years))
 
 # Calculate the probability of extinction by the end of the simulation period
-(extinction_probability <- mean(results[years,] == 0))
+(extinction_probability <- mean(results[n_years,] == 0))
 
 
 
@@ -324,7 +324,7 @@ sim_1 <- reshape2::melt(results) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
   dplyr::mutate(Model = "2-year, lambda only",
                 Year = (Year*2)-1) %>%
-  dplyr::filter(Year <= years)
+  dplyr::filter(Year <= n_years)
 
 sim_2 <- reshape2::melt(results_2yrs) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
@@ -354,7 +354,7 @@ simSummary <- rbind(sim_1, sim_2, sim_3, sim_4) %>%
 ggplot(simSummary, aes(x = Year, group = Model)) + 
   geom_line(aes(y = median_N, color = Model)) + 
   geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
-  xlim(1, years-1) + 
+  xlim(1, n_years-1) + 
   scale_color_brewer(palette = "Dark2") + 
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
