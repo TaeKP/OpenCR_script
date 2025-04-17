@@ -452,3 +452,97 @@ ggplot(simSummary_s1, aes(x = Year, group = Model)) +
   scale_color_brewer(palette = "Dark2") + 
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
+
+#-------------------------------------------------------------------------------
+## Scenario 2	
+## Decreasing the recruitment rate from 0.76 to 0.56 (Fixed other values)
+S <- 0.49 # True survival (2 yrs)
+#f <- 0.76 # Recruitment (2 yrs)  # mean value
+f <- 0.56 # Recruitment (2 yrs)   # scenario 2
+recruitment_rate <- f          # recruitment rate (f)
+survival_rate <- S        # True survival rate
+#-------------------------------------------------------------------------------
+# 1-YEAR POPULATION WITH 2 AGE CLASSES (Vital rates, age structure) #
+#-------------------------------------------------------------------#
+
+#-------------------------------------------------------------------------------
+## Function to simulate the stochasticity, equivalent to the function "pva simulation()".
+
+pva_simulation_age_str_s2 <- function(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years) {
+  
+  S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
+  f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
+  
+  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0, b = S + f) # Population growth rate
+  
+  E = abs(lambda - S - f) # Emigration rate
+  
+  init_adultProp <- truncnorm::rtruncnorm(1, mean = init_adultProp_mean, sd = init_adultProp_SD, a = 0, b = 1)
+  
+  N_mat2 <- matrix(NA, nrow = 2, ncol = n_years)
+  N_mat2[,1] <- c(1 - init_adultProp, init_adultProp)*initN
+  
+  S1yr <- S / sqrt(lambda)
+  f1yr <- f / sqrt(lambda)
+  E1yr <- E / sqrt(lambda)
+  
+  for(t in 2:length(N)){
+    
+    # Projection matrix (1 = juvenile, < 1 year old; 2 = adult, > 1 year old)
+    A <- matrix(NA, nrow = 2, ncol = 2)
+    A[1, 1] <- 0 # Juveniles producing juveniles within 1 year
+    A[2, 1] <- S1yr - E1yr # Juvenile becoming adults within 1 year
+    A[2, 2] <- S1yr - E1yr # Adults remaining alive (& in study area) within 1 year
+    A[1, 2] <- f1yr # Adults producing juveniles within 1 year
+    
+    # Calculate "per adult recruitment rate" for time-step
+    current_adultProp <- N_mat2[2, t-1] / sum(N_mat2[, t-1])
+    f1yr_ad <- f1yr /  current_adultProp
+    A[1, 2] <- f1yr_ad
+    
+    # Project
+    N_mat2[, t] <- A %*% N_mat2[, t-1]
+    
+    if(sum(N_mat2[, t]) > carrying_capacity){
+      N_mat2[, t] <- N_mat2[, t-1]
+    }
+    
+    if (N_mat2[t] < 1) { # Extinction event
+      N_mat2[t] <- 0
+      break
+    }
+  }
+  return(N_mat2)
+}
+
+#-------------------------------------------------------------------------------
+# Running the simulation multiple times
+(results_age_str_s2 <- replicate(simulations, pva_simulation_age_str(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years)) )
+
+#-------------------------------------------------------------------------------
+
+# Write results as data frames
+
+sim_s2 <- reshape2::melt(apply(results_age_str_s2, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "scenario 2")
+
+## Combine results and summarise
+simSummary_s2 <- rbind(sim_s2) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s2, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
