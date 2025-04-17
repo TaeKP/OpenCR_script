@@ -1042,3 +1042,28 @@ ggplot(simSummary_s7, aes(x = Year, group = Model)) +
   scale_color_brewer(palette = "Dark2") + 
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
+
+#-------------------------------------------------------------------------------
+# VISUAL COMPARISON #
+# 3 scenarios (5-7)
+#-------------------#
+
+## Combine results and summarise
+simSummary_3models <- rbind(sim_s5, sim_s6, sim_s7) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_3models, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
