@@ -1,9 +1,15 @@
+
+# pertFac.X = 1 --> vital rate remains unchanged
+# pertFac.X < 1 (but >= 0) --> vital rate decreases proportionally
+# pertFac.X > 1 --> Vital rate increases
+
 pva_simulation_age_str <- function(initN, 
                                    growth_rate, growth_rate_sd,
                                    survival_rate, survival_rate_sd,
                                    recruitment_rate, recruitment_rate_sd,
                                    init_adultProp, init_adultProp_SD,
                                    carrying_capacity, 
+                                   pertFac.S,
                                    n_years) {
   
   S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
@@ -18,7 +24,7 @@ pva_simulation_age_str <- function(initN,
   N_mat2 <- matrix(NA, nrow = 2, ncol = n_years)
   N_mat2[,1] <- c(1 - init_adultProp, init_adultProp)*initN
   
-  S1yr <- S / sqrt(lambda)
+  S1yr <- (S / sqrt(lambda))*pertFac.S 
   f1yr <- f / sqrt(lambda)
   E1yr <- E / sqrt(lambda)
   
