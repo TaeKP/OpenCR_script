@@ -1,4 +1,10 @@
-pva_simulation_age_str <- function(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years) {
+pva_simulation_age_str <- function(initN, 
+                                   growth_rate, growth_rate_sd,
+                                   survival_rate, survival_rate_sd,
+                                   recruitment_rate, recruitment_rate_sd,
+                                   init_adultProp, init_adultProp_SD,
+                                   carrying_capacity, 
+                                   n_years) {
   
   S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
   f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
