@@ -9,7 +9,7 @@ pva_simulation_age_str <- function(initN,
                                    recruitment_rate, recruitment_rate_sd,
                                    init_adultProp, init_adultProp_SD,
                                    carrying_capacity, 
-                                   pertFac.S,
+                                   pertFac.S, pertFac.f, pertFac.E,
                                    n_years) {
   
   S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
@@ -25,8 +25,8 @@ pva_simulation_age_str <- function(initN,
   N_mat2[,1] <- c(1 - init_adultProp, init_adultProp)*initN
   
   S1yr <- (S / sqrt(lambda))*pertFac.S 
-  f1yr <- f / sqrt(lambda)
-  E1yr <- E / sqrt(lambda)
+  f1yr <- (f / sqrt(lambda))*pertFac.f
+  E1yr <- (E / sqrt(lambda))*pertFac.E
   
   for(t in 2:length(N)){
     
