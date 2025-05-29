@@ -386,7 +386,6 @@ source("Function_pva_simulation_age_str.R")
                                                                      recruitment_rate, recruitment_rate_sd,
                                                                      init_adultProp, init_adultProp_SD,
                                                                      carrying_capacity,
-                                                                     pertFac.S = 1,
                                                                      n_years)) )
 
 #-------------------------------------------------------------------------------
