@@ -99,8 +99,6 @@ results <- replicate(simulations, pva_simulation(initial_population, growth_rate
 # Calculate the probability of extinction by the end of the simulation period
 (extinction_probability <- mean(results[n_years,] == 0))
 
-
-
 # 2-YEAR POPULATION MODEL (Vital rates) #
 #---------------------------------------#
 
@@ -109,46 +107,15 @@ results <- replicate(simulations, pva_simulation(initial_population, growth_rate
 
 N <- c(initN, rep(NA, n_years - 1)) # due to error in 1-year model; need to add object "N" outside the simulation function
 
-pva_simulation_2yrs <- function(initN, growth_rate, survival_rate, recruitment_rate, carrying_capacity, n_years) {
-  
-  N <- c(initN, rep(NA, n_years - 1))
-  Surv <- Rec <- Emi <- rep(NA, n_years)
-  
-  #N[1] <- truncnorm::rtruncnorm(1, mean = initN, sd = initialN_sd, a = 0)  # in case we need the random number of initN
-  
-  S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
-  f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0, b = S + f) # Population growth rate
-  E = abs(lambda - S - f) # Emigration rate
-  
-  for(t in 3:length(N)){
-    
-    N[t] <- N[t-2] * (S + f - E)
-    Surv[t] <- N[t-2]*S
-    Rec[t] <- N[t-2]*f
-    Emi[t] <- N[t-2]*E
-    
-    #N[t] <- ifelse(N[t] > carrying_capacity, carrying_capacity, N[t])
-    N[t] <- ifelse(N[t] > carrying_capacity, N[t-2], N[t])
-    
-    for(j in 3:length(N)){
-      
-      if (N[j-2] < 1) { # Extinction event
-        N[j-2] <- 0
-      }
-      break
-    }
-  }
-  return(N)
-}
+# Function to simulate growth_rate with stochasticity
 
+source("Function_pva_simulation_2years_vital_rates.R")
 #-------------------------------------------------------------------------------
 # Running the simulation multiple times
 results_2yrs <- replicate(simulations, pva_simulation_2yrs(initN, growth_rate, survival_rate, recruitment_rate, carrying_capacity, n_years))
 
 # Calculate the probability of extinction by the end of the simulation period
 (extinction_probability_2yrs <- mean(results_2yrs[n_years-1,] == 0))
-
 
 #-------------------------------------------------------------------------------
 
