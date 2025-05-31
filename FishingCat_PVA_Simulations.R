@@ -7,8 +7,8 @@ f <- 0.76 # Recruitment (2 yrs)
 lambda <- 1.16 # Population growth rate
 initN <- 81 # Initial population size
 #init_adultProp <- 0.4 # Proportion of initial population that is adult
-init_adultProp_mean <- 0.92 # Mean of Proportion of initial population that is adult; 3 years
-init_adultProp_SD <- 0.02 # SD of Proportion of initial population that is adult
+init_adultProp_mean <- 0.89 # Mean of Proportion of initial population that is adult; 3 years
+init_adultProp_SD <- 0.05 # SD of Proportion of initial population that is adult
 
 E = abs(lambda - S - f) # Emigration rate
 pR = 1 - E # Probability of remaining in study area
