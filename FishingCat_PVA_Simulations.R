@@ -239,32 +239,24 @@ ggplot(simSummary, aes(x = Year, group = Model)) +
   theme_bw()
 
 #-------------------------------------------------------------------------------
-## Scenario 1	
-## Decreasing the survival rate from 0.49 to 0.29 (Fixed other values)
-#S <- 0.49 # True survival (2 yrs)
-S <- 0.29 # True survival (2 yrs) # scenario 1
-survival_rate <- S        # True survival rate
-#-------------------------------------------------------------------------------
-# 1-YEAR POPULATION WITH 2 AGE CLASSES (Vital rates, age structure) #
-#-------------------------------------------------------------------#
-
-#-------------------------------------------------------------------------------
-## Function to simulate the stochasticity, equivalent to the function "pva simulation()".
+## Function to simulate the stochasticity.
+## Calling the baseline pva simulation function
 source("Function_pva_simulation_age_str.R")
 
-
 #-------------------------------------------------------------------------------
-# Running the simulation multiple times
+## Scenario 1	
+## 10% Decreasing the survival rate 
+## perturbation factor "S" at 0.9
 
-# Baseline scenario
+# Running the simulation multiple times
 (results_age_str_s1 <- replicate(simulations, pva_simulation_age_str(initN, 
                                                                      growth_rate, growth_rate_sd,
                                                                      survival_rate, survival_rate_sd,
                                                                      recruitment_rate, recruitment_rate_sd,
                                                                      init_adultProp, init_adultProp_SD,
-                                                                     carrying_capacity,
+                                                                     carrying_capacity, 
+                                                                     pertFac.S = 0.9, pertFac.f = 1, pertFac.E = 1,
                                                                      n_years)) )
-
 #-------------------------------------------------------------------------------
 
 # Write results as data frames
