@@ -617,3 +617,52 @@ ggplot(simSummary_s7, aes(x = Year, group = Model)) +
   theme_bw()
 
 #-------------------------------------------------------------------------------
+## Scenario 8
+## Due to the high threat and poor management could cause animals emigrate or move out to some better area
+## Therefore, the emigration rate must be increased
+## 20% increasing the emigration rate 
+## perturbation factor "E" at 1.2
+
+# Running the simulation multiple times
+(results_age_str_s8 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                     growth_rate, growth_rate_sd,
+                                                                     survival_rate, survival_rate_sd,
+                                                                     recruitment_rate, recruitment_rate_sd,
+                                                                     init_adultProp, init_adultProp_SD,
+                                                                     carrying_capacity, 
+                                                                     pertFac.S = 1, pertFac.f = 1, pertFac.E = 1.2,
+                                                                     n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s8 <- reshape2::melt(apply(results_age_str_s8, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "20% emigration increased")
+
+#baseline scenario
+sim_4 <- reshape2::melt(apply(results_age_str, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "1-year, vital rates & age structure")
+
+## Combine results and summarise
+simSummary_s8 <- rbind(sim_s8, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s8, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+#-------------------------------------------------------------------------------
