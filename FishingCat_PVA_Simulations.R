@@ -257,16 +257,21 @@ source("Function_pva_simulation_age_str.R")
                                                                      carrying_capacity, 
                                                                      pertFac.S = 0.9, pertFac.f = 1, pertFac.E = 1,
                                                                      n_years)) )
-#-------------------------------------------------------------------------------
 
 # Write results as data frames
+# compare with baseline scenario
 
 sim_s1 <- reshape2::melt(apply(results_age_str_s1, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "scenario 1")
+  dplyr::mutate(Model = "10% survival decreased")
+
+#baseline scenario
+sim_4 <- reshape2::melt(apply(results_age_str, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "1-year, vital rates & age structure")
 
 ## Combine results and summarise
-simSummary_s1 <- rbind(sim_s1) %>%
+simSummary_s1 <- rbind(sim_s1, sim_4) %>%
   dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
   dplyr::group_by(Model, Year) %>%
   dplyr::summarise(mean_N = mean(PopSize),
