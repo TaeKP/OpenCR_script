@@ -384,6 +384,27 @@ ggplot(simSummary_s3, aes(x = Year, group = Model)) +
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
 
+## Comparing 3 decreasing survival scenarios with baseline scenario
+## Combine results and summarise
+simSummary_s1t3 <- rbind(sim_s1, sim_s2, sim_s3, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s1t3, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
 #-------------------------------------------------------------------------------
 ## Scenario 2	
 ## Decreasing the recruitment rate from 0.76 to 0.56 (Fixed other values)
