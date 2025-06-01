@@ -453,4 +453,50 @@ ggplot(simSummary_s4, aes(x = Year, group = Model)) +
   theme_bw()
 
 #-------------------------------------------------------------------------------
+## Scenario 5	
+## 20% Decreasing the recruitment rate 
+## perturbation factor "f" at 0.8
 
+# Running the simulation multiple times
+(results_age_str_s5 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                     growth_rate, growth_rate_sd,
+                                                                     survival_rate, survival_rate_sd,
+                                                                     recruitment_rate, recruitment_rate_sd,
+                                                                     init_adultProp, init_adultProp_SD,
+                                                                     carrying_capacity, 
+                                                                     pertFac.S = 1, pertFac.f = 0.8, pertFac.E = 1,
+                                                                     n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s5 <- reshape2::melt(apply(results_age_str_s5, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "20% recruitment decreased")
+
+#baseline scenario
+sim_4 <- reshape2::melt(apply(results_age_str, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "1-year, vital rates & age structure")
+
+## Combine results and summarise
+simSummary_s5 <- rbind(sim_s5, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s5, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+#-------------------------------------------------------------------------------
