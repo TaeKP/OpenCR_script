@@ -265,11 +265,6 @@ sim_s1 <- reshape2::melt(apply(results_age_str_s1, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
   dplyr::mutate(Model = "10% survival decreased")
 
-#baseline scenario
-sim_4 <- reshape2::melt(apply(results_age_str, c(2, 3), sum)) %>%
-  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "1-year, vital rates & age structure")
-
 ## Combine results and summarise
 simSummary_s1 <- rbind(sim_s1, sim_4) %>%
   dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
@@ -312,11 +307,6 @@ sim_s2 <- reshape2::melt(apply(results_age_str_s2, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
   dplyr::mutate(Model = "20% survival decreased")
 
-#baseline scenario
-sim_4 <- reshape2::melt(apply(results_age_str, c(2, 3), sum)) %>%
-  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "1-year, vital rates & age structure")
-
 ## Combine results and summarise
 simSummary_s2 <- rbind(sim_s2, sim_4) %>%
   dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
@@ -358,11 +348,6 @@ ggplot(simSummary_s2, aes(x = Year, group = Model)) +
 sim_s3 <- reshape2::melt(apply(results_age_str_s3, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
   dplyr::mutate(Model = "30% survival decreased")
-
-#baseline scenario
-sim_4 <- reshape2::melt(apply(results_age_str, c(2, 3), sum)) %>%
-  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "1-year, vital rates & age structure")
 
 ## Combine results and summarise
 simSummary_s3 <- rbind(sim_s3, sim_4) %>%
@@ -427,11 +412,6 @@ sim_s4 <- reshape2::melt(apply(results_age_str_s4, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
   dplyr::mutate(Model = "10% recruitment decreased")
 
-#baseline scenario
-sim_4 <- reshape2::melt(apply(results_age_str, c(2, 3), sum)) %>%
-  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "1-year, vital rates & age structure")
-
 ## Combine results and summarise
 simSummary_s4 <- rbind(sim_s4, sim_4) %>%
   dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
@@ -474,11 +454,6 @@ sim_s5 <- reshape2::melt(apply(results_age_str_s5, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
   dplyr::mutate(Model = "20% recruitment decreased")
 
-#baseline scenario
-sim_4 <- reshape2::melt(apply(results_age_str, c(2, 3), sum)) %>%
-  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "1-year, vital rates & age structure")
-
 ## Combine results and summarise
 simSummary_s5 <- rbind(sim_s5, sim_4) %>%
   dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
@@ -520,11 +495,6 @@ ggplot(simSummary_s5, aes(x = Year, group = Model)) +
 sim_s6 <- reshape2::melt(apply(results_age_str_s6, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
   dplyr::mutate(Model = "30% recruitment decreased")
-
-#baseline scenario
-sim_4 <- reshape2::melt(apply(results_age_str, c(2, 3), sum)) %>%
-  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "1-year, vital rates & age structure")
 
 ## Combine results and summarise
 simSummary_s6 <- rbind(sim_s6, sim_4) %>%
@@ -591,11 +561,6 @@ sim_s7 <- reshape2::melt(apply(results_age_str_s7, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
   dplyr::mutate(Model = "10% emigration increased")
 
-#baseline scenario
-sim_4 <- reshape2::melt(apply(results_age_str, c(2, 3), sum)) %>%
-  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "1-year, vital rates & age structure")
-
 ## Combine results and summarise
 simSummary_s7 <- rbind(sim_s7, sim_4) %>%
   dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
@@ -640,11 +605,6 @@ sim_s8 <- reshape2::melt(apply(results_age_str_s8, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
   dplyr::mutate(Model = "20% emigration increased")
 
-#baseline scenario
-sim_4 <- reshape2::melt(apply(results_age_str, c(2, 3), sum)) %>%
-  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "1-year, vital rates & age structure")
-
 ## Combine results and summarise
 simSummary_s8 <- rbind(sim_s8, sim_4) %>%
   dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
@@ -688,11 +648,6 @@ ggplot(simSummary_s8, aes(x = Year, group = Model)) +
 sim_s9 <- reshape2::melt(apply(results_age_str_s9, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
   dplyr::mutate(Model = "30% emigration increased")
-
-#baseline scenario
-sim_4 <- reshape2::melt(apply(results_age_str, c(2, 3), sum)) %>%
-  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "1-year, vital rates & age structure")
 
 ## Combine results and summarise
 simSummary_s9 <- rbind(sim_s9, sim_4) %>%
@@ -758,11 +713,6 @@ sim_s10 <- reshape2::melt(apply(results_age_str_s10, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
   dplyr::mutate(Model = "10% survival increased")
 
-#baseline scenario
-sim_4 <- reshape2::melt(apply(results_age_str, c(2, 3), sum)) %>%
-  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "1-year, vital rates & age structure")
-
 ## Combine results and summarise
 simSummary_s10 <- rbind(sim_s10, sim_4) %>%
   dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
@@ -806,11 +756,6 @@ sim_s11 <- reshape2::melt(apply(results_age_str_s11, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
   dplyr::mutate(Model = "20% survival increased")
 
-#baseline scenario
-sim_4 <- reshape2::melt(apply(results_age_str, c(2, 3), sum)) %>%
-  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "1-year, vital rates & age structure")
-
 ## Combine results and summarise
 simSummary_s11 <- rbind(sim_s11, sim_4) %>%
   dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
@@ -853,11 +798,6 @@ ggplot(simSummary_s11, aes(x = Year, group = Model)) +
 sim_s12 <- reshape2::melt(apply(results_age_str_s12, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
   dplyr::mutate(Model = "30% survival increased")
-
-#baseline scenario
-sim_4 <- reshape2::melt(apply(results_age_str, c(2, 3), sum)) %>%
-  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "1-year, vital rates & age structure")
 
 ## Combine results and summarise
 simSummary_s12 <- rbind(sim_s12, sim_4) %>%
