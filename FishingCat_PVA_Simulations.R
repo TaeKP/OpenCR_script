@@ -947,7 +947,7 @@ ggplot(simSummary_s14, aes(x = Year, group = Model)) +
 
 sim_s15 <- reshape2::melt(apply(results_age_str_s15, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "20% recruitment increased")
+  dplyr::mutate(Model = "30% recruitment increased")
 
 ## Combine results and summarise
 simSummary_s15 <- rbind(sim_s15, sim_4) %>%
@@ -962,6 +962,27 @@ simSummary_s15 <- rbind(sim_s15, sim_4) %>%
 
 ## Plot
 ggplot(simSummary_s15, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+## Comparing 3 increasing recruitment scenarios with baseline scenario
+## Combine results and summarise
+simSummary_s13t15 <- rbind(sim_s13, sim_s14, sim_s15, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s13t15, aes(x = Year, group = Model)) + 
   geom_line(aes(y = median_N, color = Model)) + 
   geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
   xlim(1, n_years-1) + 
