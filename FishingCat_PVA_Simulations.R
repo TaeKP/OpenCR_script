@@ -1079,3 +1079,47 @@ ggplot(simSummary_s17, aes(x = Year, group = Model)) +
   theme_bw()
 
 #-------------------------------------------------------------------------------
+## Scenario 18
+## Low threat and good management could cause low emigration
+## Therefore, the emigration rate must be decreased
+## 30% decreasing the emigration rate 
+## perturbation factor "E" at 0.7
+
+# Running the simulation multiple times
+(results_age_str_s18 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                      growth_rate, growth_rate_sd,
+                                                                      survival_rate, survival_rate_sd,
+                                                                      recruitment_rate, recruitment_rate_sd,
+                                                                      init_adultProp, init_adultProp_SD,
+                                                                      carrying_capacity, 
+                                                                      pertFac.S = 1, pertFac.f = 1, pertFac.E = 0.7,
+                                                                      n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s18 <- reshape2::melt(apply(results_age_str_s18, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "30% emigration decreased")
+
+## Combine results and summarise
+simSummary_s18 <- rbind(sim_s18, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s18, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+#-------------------------------------------------------------------------------
