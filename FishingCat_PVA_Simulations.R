@@ -191,6 +191,14 @@ source("Function_pva_simulation_age_str.R")
                                                                   pertFac.S = 1, pertFac.f = 1, pertFac.E = 1,
                                                                   n_years)) )
 
+# Calculate the probability of extinction by the end of the simulation period
+## Remove NA values
+results_no_na_age_str <- is.na(results_age_str[,n_years,] == 0)
+
+# probability of extinction 
+(extinction_probability_age_str <- mean(results_no_na_age_str))
+
+
 # VISUAL COMPARISON #
 #-------------------#
 
