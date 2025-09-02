@@ -1375,3 +1375,10 @@ ggplot(simSummary_s20, aes(x = Year, group = Model)) +
   scale_color_brewer(palette = "Dark2") + 
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
+
+# Calculate the probability of extinction by the end of the simulation period
+## Remove NA values
+results_no_na_s20 <- is.na(results_age_str_s20[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s20 <- mean(results_no_na_s20))
