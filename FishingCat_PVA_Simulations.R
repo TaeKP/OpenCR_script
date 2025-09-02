@@ -1382,3 +1382,25 @@ results_no_na_s20 <- is.na(results_age_str_s20[,n_years,] == 0)
 
 # probability of extinction
 (extinction_probability_age_str_s20 <- mean(results_no_na_s20))
+
+## Comparing 2 additional scenarios with baseline scenario
+## Combine results and summarise
+simSummary_s19t20 <- rbind(sim_s19, sim_s20, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s19t20, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+#-------------------------------------------------------------------------------
