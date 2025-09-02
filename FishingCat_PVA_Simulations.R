@@ -342,6 +342,13 @@ ggplot(simSummary_s2, aes(x = Year, group = Model)) +
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
 
+# Calculate the probability of extinction by the end of the simulation period
+# # Remove NA values
+results_no_na_s2 <- is.na(results_age_str_s2[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s2 <- mean(results_no_na_s2))
+
 #-------------------------------------------------------------------------------
 ## Scenario 3	
 ## 30% Decreasing the survival rate 
@@ -405,6 +412,13 @@ ggplot(simSummary_s1t3, aes(x = Year, group = Model)) +
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
 
+# Calculate the probability of extinction by the end of the simulation period
+# # Remove NA values
+results_no_na_s3 <- is.na(results_age_str_s3[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s3 <- mean(results_no_na_s3))
+
 #-------------------------------------------------------------------------------
 ## Scenario 4	
 ## 10% Decreasing the recruitment rate 
@@ -447,6 +461,13 @@ ggplot(simSummary_s4, aes(x = Year, group = Model)) +
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
 
+# Calculate the probability of extinction by the end of the simulation period
+# # Remove NA values
+results_no_na_s4 <- is.na(results_age_str_s4[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s4 <- mean(results_no_na_s4))
+
 #-------------------------------------------------------------------------------
 ## Scenario 5	
 ## 20% Decreasing the recruitment rate 
@@ -488,6 +509,13 @@ ggplot(simSummary_s5, aes(x = Year, group = Model)) +
   scale_color_brewer(palette = "Dark2") + 
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
+
+# Calculate the probability of extinction by the end of the simulation period
+# # Remove NA values
+results_no_na_s5 <- is.na(results_age_str_s5[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s5 <- mean(results_no_na_s5))
 
 #-------------------------------------------------------------------------------
 ## Scenario 6	
@@ -552,6 +580,13 @@ ggplot(simSummary_s4t6, aes(x = Year, group = Model)) +
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
 
+# Calculate the probability of extinction by the end of the simulation period
+# # Remove NA values
+results_no_na_s6 <- is.na(results_age_str_s6[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s6 <- mean(results_no_na_s6))
+
 #-------------------------------------------------------------------------------
 ## Scenario 7
 ## Due to the high threat and poor management could cause animals emigrate or move out to some better area
@@ -596,6 +631,13 @@ ggplot(simSummary_s7, aes(x = Year, group = Model)) +
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
 
+# Calculate the probability of extinction by the end of the simulation period
+# # Remove NA values
+results_no_na_s7 <- is.na(results_age_str_s7[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s7 <- mean(results_no_na_s7))
+
 #-------------------------------------------------------------------------------
 ## Scenario 8
 ## Due to the high threat and poor management could cause animals emigrate or move out to some better area
@@ -639,6 +681,13 @@ ggplot(simSummary_s8, aes(x = Year, group = Model)) +
   scale_color_brewer(palette = "Dark2") + 
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
+
+# Calculate the probability of extinction by the end of the simulation period
+# # Remove NA values
+results_no_na_s8 <- is.na(results_age_str_s8[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s8 <- mean(results_no_na_s8))
 
 #-------------------------------------------------------------------------------
 ## Scenario 9
@@ -704,6 +753,13 @@ ggplot(simSummary_s7t9, aes(x = Year, group = Model)) +
   scale_color_brewer(palette = "Dark2") + 
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
+
+# Calculate the probability of extinction by the end of the simulation period
+# # Remove NA values
+results_no_na_s9 <- is.na(results_age_str_s9[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s9 <- mean(results_no_na_s9))
 
 #-------------------------------------------------------------------------------
 ## Scenario 10
