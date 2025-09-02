@@ -1282,3 +1282,46 @@ results_no_na_s18 <- is.na(results_age_str_s18[,n_years,] == 0)
 (extinction_probability_age_str_s18 <- mean(results_no_na_s18))
 
 #-------------------------------------------------------------------------------
+## Scenario 19 (additional scenario)
+## No management on land use change and still high threat (illegal-killing) could cause low survival and recruitment
+## Therefore, the survival and recruitment rate must be decreased
+## 10% decreasing both the survival and recruitment rate 
+## perturbation factor both "S and f" at 0.9
+
+# Running the simulation multiple times
+(results_age_str_s19 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                      growth_rate, growth_rate_sd,
+                                                                      survival_rate, survival_rate_sd,
+                                                                      recruitment_rate, recruitment_rate_sd,
+                                                                      init_adultProp, init_adultProp_SD,
+                                                                      carrying_capacity, 
+                                                                      pertFac.S = 0.9, pertFac.f = 0.9, pertFac.E = 1,
+                                                                      n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s19 <- reshape2::melt(apply(results_age_str_s19, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "10% survival/recruitment decreased")
+
+## Combine results and summarise
+simSummary_s19 <- rbind(sim_s19, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s19, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+#-------------------------------------------------------------------------------
