@@ -91,35 +91,13 @@ if(test_contantValues){
 #-------------------------------------------------------------------------------
 # Function to simulate growth_rate with stochasticity
 
-pva_simulation <- function(initial_population, growth_rate, carrying_capacity, n_years) {
-  population <- numeric(n_years)
-  #population[1] <- truncnorm::rtruncnorm(1, mean = initial_population, sd = initialN_sd, a = 0) # we probably want this lognormal (or truncated at 0)
-  population[1] <- initial_population
-  
-  for (year in 2:n_years) {
-    
-    stochastic_growthrate <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0) # Adding randomness
-    
-    population[year] <- population[year - 1] * stochastic_growthrate
-    
-    #population[year] <- ifelse(population[year] > carrying_capacity, carrying_capacity, population[year])
-    population[year] <- ifelse(population[year] > carrying_capacity, population[year-1], population[year])
-    
-    if (population[year] < 1) { # Extinction event
-      population[year] <- 0
-      break
-    }
-  }
-  return(population)
-}
+source("Function_pva_simulation_2years_lambda.R")
 #-------------------------------------------------------------------------------
 # Running the simulation multiple times
 results <- replicate(simulations, pva_simulation(initial_population, growth_rate, carrying_capacity, n_years))
 
 # Calculate the probability of extinction by the end of the simulation period
 (extinction_probability <- mean(results[n_years,] == 0))
-
-
 
 # 2-YEAR POPULATION MODEL (Vital rates) #
 #---------------------------------------#
@@ -129,46 +107,15 @@ results <- replicate(simulations, pva_simulation(initial_population, growth_rate
 
 N <- c(initN, rep(NA, n_years - 1)) # due to error in 1-year model; need to add object "N" outside the simulation function
 
-pva_simulation_2yrs <- function(initN, growth_rate, survival_rate, recruitment_rate, carrying_capacity, n_years) {
-  
-  N <- c(initN, rep(NA, n_years - 1))
-  Surv <- Rec <- Emi <- rep(NA, n_years)
-  
-  #N[1] <- truncnorm::rtruncnorm(1, mean = initN, sd = initialN_sd, a = 0)  # in case we need the random number of initN
-  
-  S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
-  f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0, b = S + f) # Population growth rate
-  E = abs(lambda - S - f) # Emigration rate
-  
-  for(t in 3:length(N)){
-    
-    N[t] <- N[t-2] * (S + f - E)
-    Surv[t] <- N[t-2]*S
-    Rec[t] <- N[t-2]*f
-    Emi[t] <- N[t-2]*E
-    
-    #N[t] <- ifelse(N[t] > carrying_capacity, carrying_capacity, N[t])
-    N[t] <- ifelse(N[t] > carrying_capacity, N[t-2], N[t])
-    
-    for(j in 3:length(N)){
-      
-      if (N[j-2] < 1) { # Extinction event
-        N[j-2] <- 0
-      }
-      break
-    }
-  }
-  return(N)
-}
+# Function to simulate growth_rate with stochasticity
 
+source("Function_pva_simulation_2years_vital_rates.R")
 #-------------------------------------------------------------------------------
 # Running the simulation multiple times
 results_2yrs <- replicate(simulations, pva_simulation_2yrs(initN, growth_rate, survival_rate, recruitment_rate, carrying_capacity, n_years))
 
 # Calculate the probability of extinction by the end of the simulation period
 (extinction_probability_2yrs <- mean(results_2yrs[n_years-1,] == 0))
-
 
 #-------------------------------------------------------------------------------
 
@@ -214,39 +161,7 @@ results_2yrs <- replicate(simulations, pva_simulation_2yrs(initN, growth_rate, s
 #-------------------------------------------------------------------------------
 ## Function to simulate the stochasticity, equivalent to the function "pva simulation()".
 
-pva_simulation_1yr <- function(initN, growth_rate, survival_rate, recruitment_rate, carrying_capacity, n_years) {
-  
-  N_alt <- c(initN, rep(NA, n_years - 1))
-  Surv_alt <- Rec_alt <- Emi_alt <- rep(NA, n_years)
-  
-  #N_alt[1] <- truncnorm::rtruncnorm(1, mean = initN, sd = initialN_sd, a = 0)  # in case we need the random number of initN
-  
-  S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
-  f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0, b = S + f) # Population growth rate
-  E = abs(lambda - S - f) # Emigration rate
-  
-  for(t in 2:length(N)){
-    
-    S1yr <- S / sqrt(lambda)
-    f1yr <- f / sqrt(lambda)
-    E1yr <- E / sqrt(lambda)
-    
-    N_alt[t] <- N_alt[t-1] * (S1yr + f1yr - E1yr)
-    Surv_alt[t] <- N_alt[t-1]*S1yr
-    Rec_alt[t] <- N_alt[t-1]*f1yr
-    Emi_alt[t] <- N_alt[t-1]*E1yr
-    
-    #N_alt[t] <- ifelse(N_alt[t] > carrying_capacity, carrying_capacity, N_alt[t])
-    N_alt[t] <- ifelse(N_alt[t] > carrying_capacity, N_alt[t-1], N_alt[t])
-    
-    if (N_alt[t] < 1) { # Extinction event
-      N_alt[t] <- 0
-      break
-    }
-  }
-  return(N_alt)
-}
+source("Function_pva_simulation_1year_vital_rates.R")
 
 #-------------------------------------------------------------------------------
 # Running the simulation multiple times
@@ -261,57 +176,27 @@ results_1yr <- replicate(simulations, pva_simulation_1yr(initN, growth_rate, sur
 
 #-------------------------------------------------------------------------------
 ## Function to simulate the stochasticity, equivalent to the function "pva simulation()".
+# Baseline scenario
 
-pva_simulation_age_str <- function(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years) {
-  
-  S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
-  f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-  
-  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0, b = S + f) # Population growth rate
-  
-  E = abs(lambda - S - f) # Emigration rate
-  
-  init_adultProp <- truncnorm::rtruncnorm(1, mean = init_adultProp_mean, sd = init_adultProp_SD, a = 0, b = 1)
-  
-  N_mat2 <- matrix(NA, nrow = 2, ncol = n_years)
-  N_mat2[,1] <- c(1 - init_adultProp, init_adultProp)*initN
-  
-  S1yr <- S / sqrt(lambda)
-  f1yr <- f / sqrt(lambda)
-  E1yr <- E / sqrt(lambda)
-  
-  for(t in 2:length(N)){
-    
-    # Projection matrix (1 = juvenile, < 1 year old; 2 = adult, > 1 year old)
-    A <- matrix(NA, nrow = 2, ncol = 2)
-    A[1, 1] <- 0 # Juveniles producing juveniles within 1 year
-    A[2, 1] <- S1yr - E1yr # Juvenile becoming adults within 1 year
-    A[2, 2] <- S1yr - E1yr # Adults remaining alive (& in study area) within 1 year
-    A[1, 2] <- f1yr # Adults producing juveniles within 1 year
-    
-    # Calculate "per adult recruitment rate" for time-step
-    current_adultProp <- N_mat2[2, t-1] / sum(N_mat2[, t-1])
-    f1yr_ad <- f1yr /  current_adultProp
-    A[1, 2] <- f1yr_ad
-    
-    # Project
-    N_mat2[, t] <- A %*% N_mat2[, t-1]
-    
-    if(sum(N_mat2[, t]) > carrying_capacity){
-      N_mat2[, t] <- N_mat2[, t-1]
-    }
-    
-    if (N_mat2[t] < 1) { # Extinction event
-      N_mat2[t] <- 0
-      break
-    }
-  }
-  return(N_mat2)
-}
+source("Function_pva_simulation_age_str.R")
 
 #-------------------------------------------------------------------------------
 # Running the simulation multiple times
-(results_age_str <- replicate(simulations, pva_simulation_age_str(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years)) )
+(results_age_str <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                  growth_rate, growth_rate_sd,
+                                                                  survival_rate, survival_rate_sd,
+                                                                  recruitment_rate, recruitment_rate_sd,
+                                                                  init_adultProp, init_adultProp_SD,
+                                                                  carrying_capacity, 
+                                                                  pertFac.S = 1, pertFac.f = 1, pertFac.E = 1,
+                                                                  n_years)) )
+
+# Calculate the probability of extinction by the end of the simulation period
+## Remove NA values
+results_no_na_age_str <- is.na(results_age_str[,n_years,] == 0)
+
+# probability of extinction 
+(extinction_probability_age_str <- mean(results_no_na_age_str))
 
 
 # VISUAL COMPARISON #
@@ -362,42 +247,34 @@ ggplot(simSummary, aes(x = Year, group = Model)) +
   theme_bw()
 
 #-------------------------------------------------------------------------------
-## Scenario 1	
-## Decreasing the survival rate from 0.49 to 0.29 (Fixed other values)
-#S <- 0.49 # True survival (2 yrs)
-S <- 0.29 # True survival (2 yrs) # scenario 1
-survival_rate <- S        # True survival rate
-#-------------------------------------------------------------------------------
-# 1-YEAR POPULATION WITH 2 AGE CLASSES (Vital rates, age structure) #
-#-------------------------------------------------------------------#
-
-#-------------------------------------------------------------------------------
-## Function to simulate the stochasticity, equivalent to the function "pva simulation()".
+## Function to simulate the stochasticity.
+## Calling the baseline pva simulation function
 source("Function_pva_simulation_age_str.R")
 
-
 #-------------------------------------------------------------------------------
-# Running the simulation multiple times
+## Scenario 1	
+## 10% Decreasing the survival rate 
+## perturbation factor "S" at 0.9
 
-# Baseline scenario
+# Running the simulation multiple times
 (results_age_str_s1 <- replicate(simulations, pva_simulation_age_str(initN, 
                                                                      growth_rate, growth_rate_sd,
                                                                      survival_rate, survival_rate_sd,
                                                                      recruitment_rate, recruitment_rate_sd,
                                                                      init_adultProp, init_adultProp_SD,
-                                                                     carrying_capacity,
+                                                                     carrying_capacity, 
+                                                                     pertFac.S = 0.9, pertFac.f = 1, pertFac.E = 1,
                                                                      n_years)) )
 
-#-------------------------------------------------------------------------------
-
 # Write results as data frames
+# compare with baseline scenario
 
 sim_s1 <- reshape2::melt(apply(results_age_str_s1, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "scenario 1")
+  dplyr::mutate(Model = "10% survival decreased")
 
 ## Combine results and summarise
-simSummary_s1 <- rbind(sim_s1) %>%
+simSummary_s1 <- rbind(sim_s1, sim_4) %>%
   dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
   dplyr::group_by(Model, Year) %>%
   dplyr::summarise(mean_N = mean(PopSize),
@@ -416,82 +293,37 @@ ggplot(simSummary_s1, aes(x = Year, group = Model)) +
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
 
+# Calculate the probability of extinction by the end of the simulation period
+# # Remove NA values
+results_no_na_s1 <- is.na(results_age_str_s1[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s1 <- mean(results_no_na_s1))
+
 #-------------------------------------------------------------------------------
 ## Scenario 2	
-## Decreasing the recruitment rate from 0.76 to 0.56 (Fixed other values)
-S <- 0.49 # True survival (2 yrs)
-#f <- 0.76 # Recruitment (2 yrs)  # mean value
-f <- 0.56 # Recruitment (2 yrs)   # scenario 2
-recruitment_rate <- f          # recruitment rate (f)
-survival_rate <- S        # True survival rate
-#-------------------------------------------------------------------------------
-# 1-YEAR POPULATION WITH 2 AGE CLASSES (Vital rates, age structure) #
-#-------------------------------------------------------------------#
+## 20% Decreasing the survival rate 
+## perturbation factor "S" at 0.8
 
-#-------------------------------------------------------------------------------
-## Function to simulate the stochasticity, equivalent to the function "pva simulation()".
-
-pva_simulation_age_str_s2 <- function(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years) {
-  
-  S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
-  f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-  
-  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0, b = S + f) # Population growth rate
-  
-  E = abs(lambda - S - f) # Emigration rate
-  
-  init_adultProp <- truncnorm::rtruncnorm(1, mean = init_adultProp_mean, sd = init_adultProp_SD, a = 0, b = 1)
-  
-  N_mat2 <- matrix(NA, nrow = 2, ncol = n_years)
-  N_mat2[,1] <- c(1 - init_adultProp, init_adultProp)*initN
-  
-  S1yr <- S / sqrt(lambda)
-  f1yr <- f / sqrt(lambda)
-  E1yr <- E / sqrt(lambda)
-  
-  for(t in 2:length(N)){
-    
-    # Projection matrix (1 = juvenile, < 1 year old; 2 = adult, > 1 year old)
-    A <- matrix(NA, nrow = 2, ncol = 2)
-    A[1, 1] <- 0 # Juveniles producing juveniles within 1 year
-    A[2, 1] <- S1yr - E1yr # Juvenile becoming adults within 1 year
-    A[2, 2] <- S1yr - E1yr # Adults remaining alive (& in study area) within 1 year
-    A[1, 2] <- f1yr # Adults producing juveniles within 1 year
-    
-    # Calculate "per adult recruitment rate" for time-step
-    current_adultProp <- N_mat2[2, t-1] / sum(N_mat2[, t-1])
-    f1yr_ad <- f1yr /  current_adultProp
-    A[1, 2] <- f1yr_ad
-    
-    # Project
-    N_mat2[, t] <- A %*% N_mat2[, t-1]
-    
-    if(sum(N_mat2[, t]) > carrying_capacity){
-      N_mat2[, t] <- N_mat2[, t-1]
-    }
-    
-    if (N_mat2[t] < 1) { # Extinction event
-      N_mat2[t] <- 0
-      break
-    }
-  }
-  return(N_mat2)
-}
-
-#-------------------------------------------------------------------------------
 # Running the simulation multiple times
-(results_age_str_s2 <- replicate(simulations, pva_simulation_age_str(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years)) )
-
-#-------------------------------------------------------------------------------
+(results_age_str_s2 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                     growth_rate, growth_rate_sd,
+                                                                     survival_rate, survival_rate_sd,
+                                                                     recruitment_rate, recruitment_rate_sd,
+                                                                     init_adultProp, init_adultProp_SD,
+                                                                     carrying_capacity, 
+                                                                     pertFac.S = 0.8, pertFac.f = 1, pertFac.E = 1,
+                                                                     n_years)) )
 
 # Write results as data frames
+# compare with baseline scenario
 
 sim_s2 <- reshape2::melt(apply(results_age_str_s2, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "scenario 2")
+  dplyr::mutate(Model = "20% survival decreased")
 
 ## Combine results and summarise
-simSummary_s2 <- rbind(sim_s2) %>%
+simSummary_s2 <- rbind(sim_s2, sim_4) %>%
   dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
   dplyr::group_by(Model, Year) %>%
   dplyr::summarise(mean_N = mean(PopSize),
@@ -510,82 +342,37 @@ ggplot(simSummary_s2, aes(x = Year, group = Model)) +
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
 
+# Calculate the probability of extinction by the end of the simulation period
+# # Remove NA values
+results_no_na_s2 <- is.na(results_age_str_s2[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s2 <- mean(results_no_na_s2))
+
 #-------------------------------------------------------------------------------
 ## Scenario 3	
-## Decreasing the growth rate from 1.16 to 0.96 (Fixed other values)
-f <- 0.76 # Recruitment (2 yrs)   # mean value
-#lambda <- 1.16                   # mean value
-lambda <- 0.96 # Population growth rate  # scenario 3
-growth_rate <- lambda          # growth rate (lambda)
-recruitment_rate <- f          # recruitment rate (f)
-#-------------------------------------------------------------------------------
-# 1-YEAR POPULATION WITH 2 AGE CLASSES (Vital rates, age structure) #
-#-------------------------------------------------------------------#
+## 30% Decreasing the survival rate 
+## perturbation factor "S" at 0.7
 
-#-------------------------------------------------------------------------------
-## Function to simulate the stochasticity, equivalent to the function "pva simulation()".
-
-pva_simulation_age_str_s3 <- function(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years) {
-  
-  S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
-  f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-  
-  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0, b = S + f) # Population growth rate
-  
-  E = abs(lambda - S - f) # Emigration rate
-  
-  init_adultProp <- truncnorm::rtruncnorm(1, mean = init_adultProp_mean, sd = init_adultProp_SD, a = 0, b = 1)
-  
-  N_mat2 <- matrix(NA, nrow = 2, ncol = n_years)
-  N_mat2[,1] <- c(1 - init_adultProp, init_adultProp)*initN
-  
-  S1yr <- S / sqrt(lambda)
-  f1yr <- f / sqrt(lambda)
-  E1yr <- E / sqrt(lambda)
-  
-  for(t in 2:length(N)){
-    
-    # Projection matrix (1 = juvenile, < 1 year old; 2 = adult, > 1 year old)
-    A <- matrix(NA, nrow = 2, ncol = 2)
-    A[1, 1] <- 0 # Juveniles producing juveniles within 1 year
-    A[2, 1] <- S1yr - E1yr # Juvenile becoming adults within 1 year
-    A[2, 2] <- S1yr - E1yr # Adults remaining alive (& in study area) within 1 year
-    A[1, 2] <- f1yr # Adults producing juveniles within 1 year
-    
-    # Calculate "per adult recruitment rate" for time-step
-    current_adultProp <- N_mat2[2, t-1] / sum(N_mat2[, t-1])
-    f1yr_ad <- f1yr /  current_adultProp
-    A[1, 2] <- f1yr_ad
-    
-    # Project
-    N_mat2[, t] <- A %*% N_mat2[, t-1]
-    
-    if(sum(N_mat2[, t]) > carrying_capacity){
-      N_mat2[, t] <- N_mat2[, t-1]
-    }
-    
-    if (N_mat2[t] < 1) { # Extinction event
-      N_mat2[t] <- 0
-      break
-    }
-  }
-  return(N_mat2)
-}
-
-#-------------------------------------------------------------------------------
 # Running the simulation multiple times
-(results_age_str_s3 <- replicate(simulations, pva_simulation_age_str(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years)) )
-
-#-------------------------------------------------------------------------------
+(results_age_str_s3 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                     growth_rate, growth_rate_sd,
+                                                                     survival_rate, survival_rate_sd,
+                                                                     recruitment_rate, recruitment_rate_sd,
+                                                                     init_adultProp, init_adultProp_SD,
+                                                                     carrying_capacity, 
+                                                                     pertFac.S = 0.7, pertFac.f = 1, pertFac.E = 1,
+                                                                     n_years)) )
 
 # Write results as data frames
+# compare with baseline scenario
 
 sim_s3 <- reshape2::melt(apply(results_age_str_s3, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "scenario 3")
+  dplyr::mutate(Model = "30% survival decreased")
 
 ## Combine results and summarise
-simSummary_s3 <- rbind(sim_s3) %>%
+simSummary_s3 <- rbind(sim_s3, sim_4) %>%
   dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
   dplyr::group_by(Model, Year) %>%
   dplyr::summarise(mean_N = mean(PopSize),
@@ -604,81 +391,58 @@ ggplot(simSummary_s3, aes(x = Year, group = Model)) +
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
 
+## Comparing 3 decreasing survival scenarios with baseline scenario
+## Combine results and summarise
+simSummary_s1t3 <- rbind(sim_s1, sim_s2, sim_s3, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s1t3, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+# Calculate the probability of extinction by the end of the simulation period
+# # Remove NA values
+results_no_na_s3 <- is.na(results_age_str_s3[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s3 <- mean(results_no_na_s3))
+
 #-------------------------------------------------------------------------------
 ## Scenario 4	
-## Decreasing the adult proportion from 0.92 to 0.72 (Fixed other values)
-lambda <- 1.16                    # mean value
-#init_adultProp_mean <- 0.92      # mean value
-init_adultProp_mean <- 0.72  # scenario 4
-growth_rate <- lambda          # growth rate (lambda)
-#-------------------------------------------------------------------------------
-# 1-YEAR POPULATION WITH 2 AGE CLASSES (Vital rates, age structure) #
-#-------------------------------------------------------------------#
+## 10% Decreasing the recruitment rate 
+## perturbation factor "f" at 0.9
 
-#-------------------------------------------------------------------------------
-## Function to simulate the stochasticity, equivalent to the function "pva simulation()".
-
-pva_simulation_age_str_s4 <- function(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years) {
-  
-  S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
-  f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-  
-  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0, b = S + f) # Population growth rate
-  
-  E = abs(lambda - S - f) # Emigration rate
-  
-  init_adultProp <- truncnorm::rtruncnorm(1, mean = init_adultProp_mean, sd = init_adultProp_SD, a = 0, b = 1)
-  
-  N_mat2 <- matrix(NA, nrow = 2, ncol = n_years)
-  N_mat2[,1] <- c(1 - init_adultProp, init_adultProp)*initN
-  
-  S1yr <- S / sqrt(lambda)
-  f1yr <- f / sqrt(lambda)
-  E1yr <- E / sqrt(lambda)
-  
-  for(t in 2:length(N)){
-    
-    # Projection matrix (1 = juvenile, < 1 year old; 2 = adult, > 1 year old)
-    A <- matrix(NA, nrow = 2, ncol = 2)
-    A[1, 1] <- 0 # Juveniles producing juveniles within 1 year
-    A[2, 1] <- S1yr - E1yr # Juvenile becoming adults within 1 year
-    A[2, 2] <- S1yr - E1yr # Adults remaining alive (& in study area) within 1 year
-    A[1, 2] <- f1yr # Adults producing juveniles within 1 year
-    
-    # Calculate "per adult recruitment rate" for time-step
-    current_adultProp <- N_mat2[2, t-1] / sum(N_mat2[, t-1])
-    f1yr_ad <- f1yr /  current_adultProp
-    A[1, 2] <- f1yr_ad
-    
-    # Project
-    N_mat2[, t] <- A %*% N_mat2[, t-1]
-    
-    if(sum(N_mat2[, t]) > carrying_capacity){
-      N_mat2[, t] <- N_mat2[, t-1]
-    }
-    
-    if (N_mat2[t] < 1) { # Extinction event
-      N_mat2[t] <- 0
-      break
-    }
-  }
-  return(N_mat2)
-}
-
-#-------------------------------------------------------------------------------
 # Running the simulation multiple times
-(results_age_str_s4 <- replicate(simulations, pva_simulation_age_str(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years)) )
-
-#-------------------------------------------------------------------------------
+(results_age_str_s4 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                     growth_rate, growth_rate_sd,
+                                                                     survival_rate, survival_rate_sd,
+                                                                     recruitment_rate, recruitment_rate_sd,
+                                                                     init_adultProp, init_adultProp_SD,
+                                                                     carrying_capacity, 
+                                                                     pertFac.S = 1, pertFac.f = 0.9, pertFac.E = 1,
+                                                                     n_years)) )
 
 # Write results as data frames
+# compare with baseline scenario
 
 sim_s4 <- reshape2::melt(apply(results_age_str_s4, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "scenario 4")
+  dplyr::mutate(Model = "10% recruitment decreased")
 
 ## Combine results and summarise
-simSummary_s4 <- rbind(sim_s4) %>%
+simSummary_s4 <- rbind(sim_s4, sim_4) %>%
   dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
   dplyr::group_by(Model, Year) %>%
   dplyr::summarise(mean_N = mean(PopSize),
@@ -697,64 +461,37 @@ ggplot(simSummary_s4, aes(x = Year, group = Model)) +
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
 
-#-------------------------------------------------------------------------------
-# VISUAL COMPARISON #
-# 4 scenarios (1-4)
-#-------------------#
+# Calculate the probability of extinction by the end of the simulation period
+# # Remove NA values
+results_no_na_s4 <- is.na(results_age_str_s4[,n_years,] == 0)
 
-## Combine results and summarise
-simSummary_4models <- rbind(sim_s1, sim_s2, sim_s3, sim_s4) %>%
-  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
-  dplyr::group_by(Model, Year) %>%
-  dplyr::summarise(mean_N = mean(PopSize),
-                   median_N = median(PopSize),
-                   sd_N = sd(PopSize),
-                   lCI_N = quantile(PopSize, probs = 0.025),
-                   uCI_N = quantile(PopSize, probs = 0.975),
-                   .groups = "keep") 
+# probability of extinction
+(extinction_probability_age_str_s4 <- mean(results_no_na_s4))
 
-## Plot
-ggplot(simSummary_4models, aes(x = Year, group = Model)) + 
-  geom_line(aes(y = median_N, color = Model)) + 
-  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
-  xlim(1, n_years-1) + 
-  scale_color_brewer(palette = "Dark2") + 
-  scale_fill_brewer(palette = "Dark2") + 
-  theme_bw()
-#-------------------------------------------------------------------------------
-
-## Increasing vital rate due to high management context and low treats in the area. 
-## Which increase 20% of each vital rate
 #-------------------------------------------------------------------------------
 ## Scenario 5	
-## Increasing the survival rate
+## 20% Decreasing the recruitment rate 
+## perturbation factor "f" at 0.8
 
-#-------------------------------------------------------------------------------
-# 1-YEAR POPULATION WITH 2 AGE CLASSES (Vital rates, age structure) #
-#-------------------------------------------------------------------#
-
+# Running the simulation multiple times
 (results_age_str_s5 <- replicate(simulations, pva_simulation_age_str(initN, 
                                                                      growth_rate, growth_rate_sd,
                                                                      survival_rate, survival_rate_sd,
                                                                      recruitment_rate, recruitment_rate_sd,
                                                                      init_adultProp, init_adultProp_SD,
-                                                                     carrying_capacity,
-                                                                     pertFac.S = 1.2,
+                                                                     carrying_capacity, 
+                                                                     pertFac.S = 1, pertFac.f = 0.8, pertFac.E = 1,
                                                                      n_years)) )
 
-#-------------------------------------------------------------------------------
-# Running the simulation multiple times
-
-#-------------------------------------------------------------------------------
-
 # Write results as data frames
+# compare with baseline scenario
 
 sim_s5 <- reshape2::melt(apply(results_age_str_s5, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "scenario 5")
+  dplyr::mutate(Model = "20% recruitment decreased")
 
 ## Combine results and summarise
-simSummary_s5 <- rbind(sim_s5) %>%
+simSummary_s5 <- rbind(sim_s5, sim_4) %>%
   dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
   dplyr::group_by(Model, Year) %>%
   dplyr::summarise(mean_N = mean(PopSize),
@@ -773,82 +510,37 @@ ggplot(simSummary_s5, aes(x = Year, group = Model)) +
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
 
+# Calculate the probability of extinction by the end of the simulation period
+# # Remove NA values
+results_no_na_s5 <- is.na(results_age_str_s5[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s5 <- mean(results_no_na_s5))
+
 #-------------------------------------------------------------------------------
 ## Scenario 6	
-## Increasing the recruitment rate from 0.76 to 0.96 (Fixed other values)
-S <- 0.49 # True survival (2 yrs)
-#f <- 0.76 # Recruitment (2 yrs)  # mean value
-f <- 0.96 # Recruitment (2 yrs)   # scenario 6
-recruitment_rate <- f          # recruitment rate (f)
-survival_rate <- S        # True survival rate
-#-------------------------------------------------------------------------------
-# 1-YEAR POPULATION WITH 2 AGE CLASSES (Vital rates, age structure) #
-#-------------------------------------------------------------------#
+## 30% Decreasing the recruitment rate 
+## perturbation factor "f" at 0.7
 
-#-------------------------------------------------------------------------------
-## Function to simulate the stochasticity, equivalent to the function "pva simulation()".
-
-pva_simulation_age_str_s6 <- function(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years) {
-  
-  S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
-  f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-  
-  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0, b = S + f) # Population growth rate
-  
-  E = abs(lambda - S - f) # Emigration rate
-  
-  init_adultProp <- truncnorm::rtruncnorm(1, mean = init_adultProp_mean, sd = init_adultProp_SD, a = 0, b = 1)
-  
-  N_mat2 <- matrix(NA, nrow = 2, ncol = n_years)
-  N_mat2[,1] <- c(1 - init_adultProp, init_adultProp)*initN
-  
-  S1yr <- S / sqrt(lambda)
-  f1yr <- f / sqrt(lambda)
-  E1yr <- E / sqrt(lambda)
-  
-  for(t in 2:length(N)){
-    
-    # Projection matrix (1 = juvenile, < 1 year old; 2 = adult, > 1 year old)
-    A <- matrix(NA, nrow = 2, ncol = 2)
-    A[1, 1] <- 0 # Juveniles producing juveniles within 1 year
-    A[2, 1] <- S1yr - E1yr # Juvenile becoming adults within 1 year
-    A[2, 2] <- S1yr - E1yr # Adults remaining alive (& in study area) within 1 year
-    A[1, 2] <- f1yr # Adults producing juveniles within 1 year
-    
-    # Calculate "per adult recruitment rate" for time-step
-    current_adultProp <- N_mat2[2, t-1] / sum(N_mat2[, t-1])
-    f1yr_ad <- f1yr /  current_adultProp
-    A[1, 2] <- f1yr_ad
-    
-    # Project
-    N_mat2[, t] <- A %*% N_mat2[, t-1]
-    
-    if(sum(N_mat2[, t]) > carrying_capacity){
-      N_mat2[, t] <- N_mat2[, t-1]
-    }
-    
-    if (N_mat2[t] < 1) { # Extinction event
-      N_mat2[t] <- 0
-      break
-    }
-  }
-  return(N_mat2)
-}
-
-#-------------------------------------------------------------------------------
 # Running the simulation multiple times
-(results_age_str_s6 <- replicate(simulations, pva_simulation_age_str(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years)) )
-
-#-------------------------------------------------------------------------------
+(results_age_str_s6 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                     growth_rate, growth_rate_sd,
+                                                                     survival_rate, survival_rate_sd,
+                                                                     recruitment_rate, recruitment_rate_sd,
+                                                                     init_adultProp, init_adultProp_SD,
+                                                                     carrying_capacity, 
+                                                                     pertFac.S = 1, pertFac.f = 0.7, pertFac.E = 1,
+                                                                     n_years)) )
 
 # Write results as data frames
+# compare with baseline scenario
 
 sim_s6 <- reshape2::melt(apply(results_age_str_s6, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "scenario 6")
+  dplyr::mutate(Model = "30% recruitment decreased")
 
 ## Combine results and summarise
-simSummary_s6 <- rbind(sim_s6) %>%
+simSummary_s6 <- rbind(sim_s6, sim_4) %>%
   dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
   dplyr::group_by(Model, Year) %>%
   dplyr::summarise(mean_N = mean(PopSize),
@@ -867,82 +559,60 @@ ggplot(simSummary_s6, aes(x = Year, group = Model)) +
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
 
-#-------------------------------------------------------------------------------
-## Scenario 7	
-## Increasing the growth rate from 1.16 to 1.36 (Fixed other values)
-f <- 0.76 # Recruitment (2 yrs)   # mean value
-#lambda <- 1.16                   # mean value
-lambda <- 1.36 # Population growth rate  # scenario 7
-growth_rate <- lambda          # growth rate (lambda)
-recruitment_rate <- f          # recruitment rate (f)
-#-------------------------------------------------------------------------------
-# 1-YEAR POPULATION WITH 2 AGE CLASSES (Vital rates, age structure) #
-#-------------------------------------------------------------------#
+## Comparing 3 decreasing recruitment scenarios with baseline scenario
+## Combine results and summarise
+simSummary_s4t6 <- rbind(sim_s4, sim_s5, sim_s6, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s4t6, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+# Calculate the probability of extinction by the end of the simulation period
+# # Remove NA values
+results_no_na_s6 <- is.na(results_age_str_s6[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s6 <- mean(results_no_na_s6))
 
 #-------------------------------------------------------------------------------
-## Function to simulate the stochasticity, equivalent to the function "pva simulation()".
+## Scenario 7
+## Due to the high threat and poor management could cause animals emigrate or move out to some better area
+## Therefore, the emigration rate must be increased
+## 10% increasing the emigration rate 
+## perturbation factor "E" at 1.1
 
-pva_simulation_age_str_s7 <- function(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years) {
-  
-  S <- truncnorm::rtruncnorm(1, mean = survival_rate, sd = survival_rate_sd, a = 0, b = 1) # True survival (2 yrs)
-  f <- truncnorm::rtruncnorm(1, mean = recruitment_rate, sd = recruitment_rate_sd, a = 0) # Recruitment (2 yrs)
-  
-  lambda <- truncnorm::rtruncnorm(1, mean = growth_rate, sd = growth_rate_sd, a = 0, b = S + f) # Population growth rate
-  
-  E = abs(lambda - S - f) # Emigration rate
-  
-  init_adultProp <- truncnorm::rtruncnorm(1, mean = init_adultProp_mean, sd = init_adultProp_SD, a = 0, b = 1)
-  
-  N_mat2 <- matrix(NA, nrow = 2, ncol = n_years)
-  N_mat2[,1] <- c(1 - init_adultProp, init_adultProp)*initN
-  
-  S1yr <- S / sqrt(lambda)
-  f1yr <- f / sqrt(lambda)
-  E1yr <- E / sqrt(lambda)
-  
-  for(t in 2:length(N)){
-    
-    # Projection matrix (1 = juvenile, < 1 year old; 2 = adult, > 1 year old)
-    A <- matrix(NA, nrow = 2, ncol = 2)
-    A[1, 1] <- 0 # Juveniles producing juveniles within 1 year
-    A[2, 1] <- S1yr - E1yr # Juvenile becoming adults within 1 year
-    A[2, 2] <- S1yr - E1yr # Adults remaining alive (& in study area) within 1 year
-    A[1, 2] <- f1yr # Adults producing juveniles within 1 year
-    
-    # Calculate "per adult recruitment rate" for time-step
-    current_adultProp <- N_mat2[2, t-1] / sum(N_mat2[, t-1])
-    f1yr_ad <- f1yr /  current_adultProp
-    A[1, 2] <- f1yr_ad
-    
-    # Project
-    N_mat2[, t] <- A %*% N_mat2[, t-1]
-    
-    if(sum(N_mat2[, t]) > carrying_capacity){
-      N_mat2[, t] <- N_mat2[, t-1]
-    }
-    
-    if (N_mat2[t] < 1) { # Extinction event
-      N_mat2[t] <- 0
-      break
-    }
-  }
-  return(N_mat2)
-}
-
-#-------------------------------------------------------------------------------
 # Running the simulation multiple times
-(results_age_str_s7 <- replicate(simulations, pva_simulation_age_str(initN, growth_rate, survival_rate, recruitment_rate, init_adultProp, carrying_capacity, n_years)) )
-
-#-------------------------------------------------------------------------------
+(results_age_str_s7 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                     growth_rate, growth_rate_sd,
+                                                                     survival_rate, survival_rate_sd,
+                                                                     recruitment_rate, recruitment_rate_sd,
+                                                                     init_adultProp, init_adultProp_SD,
+                                                                     carrying_capacity, 
+                                                                     pertFac.S = 1, pertFac.f = 1, pertFac.E = 1.1,
+                                                                     n_years)) )
 
 # Write results as data frames
+# compare with baseline scenario
 
 sim_s7 <- reshape2::melt(apply(results_age_str_s7, c(2, 3), sum)) %>%
   dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
-  dplyr::mutate(Model = "scenario 7")
+  dplyr::mutate(Model = "10% emigration increased")
 
 ## Combine results and summarise
-simSummary_s7 <- rbind(sim_s7) %>%
+simSummary_s7 <- rbind(sim_s7, sim_4) %>%
   dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
   dplyr::group_by(Model, Year) %>%
   dplyr::summarise(mean_N = mean(PopSize),
@@ -961,13 +631,39 @@ ggplot(simSummary_s7, aes(x = Year, group = Model)) +
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
 
+# Calculate the probability of extinction by the end of the simulation period
+# # Remove NA values
+results_no_na_s7 <- is.na(results_age_str_s7[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s7 <- mean(results_no_na_s7))
+
 #-------------------------------------------------------------------------------
-# VISUAL COMPARISON #
-# 3 scenarios (5-7)
-#-------------------#
+## Scenario 8
+## Due to the high threat and poor management could cause animals emigrate or move out to some better area
+## Therefore, the emigration rate must be increased
+## 20% increasing the emigration rate 
+## perturbation factor "E" at 1.2
+
+# Running the simulation multiple times
+(results_age_str_s8 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                     growth_rate, growth_rate_sd,
+                                                                     survival_rate, survival_rate_sd,
+                                                                     recruitment_rate, recruitment_rate_sd,
+                                                                     init_adultProp, init_adultProp_SD,
+                                                                     carrying_capacity, 
+                                                                     pertFac.S = 1, pertFac.f = 1, pertFac.E = 1.2,
+                                                                     n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s8 <- reshape2::melt(apply(results_age_str_s8, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "20% emigration increased")
 
 ## Combine results and summarise
-simSummary_3models <- rbind(sim_s5, sim_s6, sim_s7) %>%
+simSummary_s8 <- rbind(sim_s8, sim_4) %>%
   dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
   dplyr::group_by(Model, Year) %>%
   dplyr::summarise(mean_N = mean(PopSize),
@@ -978,10 +674,733 @@ simSummary_3models <- rbind(sim_s5, sim_s6, sim_s7) %>%
                    .groups = "keep") 
 
 ## Plot
-ggplot(simSummary_3models, aes(x = Year, group = Model)) + 
+ggplot(simSummary_s8, aes(x = Year, group = Model)) + 
   geom_line(aes(y = median_N, color = Model)) + 
   geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
   xlim(1, n_years-1) + 
   scale_color_brewer(palette = "Dark2") + 
   scale_fill_brewer(palette = "Dark2") + 
   theme_bw()
+
+# Calculate the probability of extinction by the end of the simulation period
+# # Remove NA values
+results_no_na_s8 <- is.na(results_age_str_s8[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s8 <- mean(results_no_na_s8))
+
+#-------------------------------------------------------------------------------
+## Scenario 9
+## Due to the high threat and poor management could cause animals emigrate or move out to some better area
+## Therefore, the emigration rate must be increased
+## 30% increasing the emigration rate 
+## perturbation factor "E" at 1.3
+
+# Running the simulation multiple times
+(results_age_str_s9 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                     growth_rate, growth_rate_sd,
+                                                                     survival_rate, survival_rate_sd,
+                                                                     recruitment_rate, recruitment_rate_sd,
+                                                                     init_adultProp, init_adultProp_SD,
+                                                                     carrying_capacity, 
+                                                                     pertFac.S = 1, pertFac.f = 1, pertFac.E = 1.3,
+                                                                     n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s9 <- reshape2::melt(apply(results_age_str_s9, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "30% emigration increased")
+
+## Combine results and summarise
+simSummary_s9 <- rbind(sim_s9, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s9, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+## Comparing 3 increasing emigration scenarios with baseline scenario
+## Combine results and summarise
+simSummary_s7t9 <- rbind(sim_s7, sim_s8, sim_s9, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s7t9, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+# Calculate the probability of extinction by the end of the simulation period
+# # Remove NA values
+results_no_na_s9 <- is.na(results_age_str_s9[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s9 <- mean(results_no_na_s9))
+
+#-------------------------------------------------------------------------------
+## Scenario 10
+## Low threat and good management
+## 10% increasing the survival rate 
+## perturbation factor "S" at 1.1
+
+# Running the simulation multiple times
+(results_age_str_s10 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                     growth_rate, growth_rate_sd,
+                                                                     survival_rate, survival_rate_sd,
+                                                                     recruitment_rate, recruitment_rate_sd,
+                                                                     init_adultProp, init_adultProp_SD,
+                                                                     carrying_capacity, 
+                                                                     pertFac.S = 1.1, pertFac.f = 1, pertFac.E = 1,
+                                                                     n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s10 <- reshape2::melt(apply(results_age_str_s10, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "10% survival increased")
+
+## Combine results and summarise
+simSummary_s10 <- rbind(sim_s10, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s10, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+# Calculate the probability of extinction by the end of the simulation period
+## Remove NA values
+results_no_na_s10 <- is.na(results_age_str_s10[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s10 <- mean(results_no_na_s10))
+
+#-------------------------------------------------------------------------------
+## Scenario 11
+## Low threat and good management
+## 20% increasing the survival rate 
+## perturbation factor "S" at 1.2
+
+# Running the simulation multiple times
+(results_age_str_s11 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                      growth_rate, growth_rate_sd,
+                                                                      survival_rate, survival_rate_sd,
+                                                                      recruitment_rate, recruitment_rate_sd,
+                                                                      init_adultProp, init_adultProp_SD,
+                                                                      carrying_capacity, 
+                                                                      pertFac.S = 1.2, pertFac.f = 1, pertFac.E = 1,
+                                                                      n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s11 <- reshape2::melt(apply(results_age_str_s11, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "20% survival increased")
+
+## Combine results and summarise
+simSummary_s11 <- rbind(sim_s11, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s11, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+
+# Calculate the probability of extinction by the end of the simulation period
+## Remove NA values
+results_no_na_s11 <- is.na(results_age_str_s11[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s11 <- mean(results_no_na_s11))
+
+#-------------------------------------------------------------------------------
+## Scenario 12
+## Low threat and good management
+## 30% increasing the survival rate 
+## perturbation factor "S" at 1.3
+
+# Running the simulation multiple times
+(results_age_str_s12 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                      growth_rate, growth_rate_sd,
+                                                                      survival_rate, survival_rate_sd,
+                                                                      recruitment_rate, recruitment_rate_sd,
+                                                                      init_adultProp, init_adultProp_SD,
+                                                                      carrying_capacity, 
+                                                                      pertFac.S = 1.3, pertFac.f = 1, pertFac.E = 1,
+                                                                      n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s12 <- reshape2::melt(apply(results_age_str_s12, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "30% survival increased")
+
+## Combine results and summarise
+simSummary_s12 <- rbind(sim_s12, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s12, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+## Comparing 3 increasing survival scenarios with baseline scenario
+## Combine results and summarise
+simSummary_s10t12 <- rbind(sim_s10, sim_s11, sim_s12, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s10t12, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+
+# Calculate the probability of extinction by the end of the simulation period
+## Remove NA values
+results_no_na_s12 <- is.na(results_age_str_s12[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s12 <- mean(results_no_na_s12))
+
+#-------------------------------------------------------------------------------
+## Scenario 13
+## Low threat and good management
+## 10% increasing the recruitment rate 
+## perturbation factor "f" at 1.1
+
+# Running the simulation multiple times
+(results_age_str_s13 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                      growth_rate, growth_rate_sd,
+                                                                      survival_rate, survival_rate_sd,
+                                                                      recruitment_rate, recruitment_rate_sd,
+                                                                      init_adultProp, init_adultProp_SD,
+                                                                      carrying_capacity, 
+                                                                      pertFac.S = 1, pertFac.f = 1.1, pertFac.E = 1,
+                                                                      n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s13 <- reshape2::melt(apply(results_age_str_s13, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "10% recruitment increased")
+
+## Combine results and summarise
+simSummary_s13 <- rbind(sim_s13, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s13, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+
+# Calculate the probability of extinction by the end of the simulation period
+## Remove NA values
+results_no_na_s13 <- is.na(results_age_str_s13[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s13 <- mean(results_no_na_s13))
+
+#-------------------------------------------------------------------------------
+## Scenario 14
+## Low threat and good management
+## 20% increasing the recruitment rate 
+## perturbation factor "f" at 1.2
+
+# Running the simulation multiple times
+(results_age_str_s14 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                      growth_rate, growth_rate_sd,
+                                                                      survival_rate, survival_rate_sd,
+                                                                      recruitment_rate, recruitment_rate_sd,
+                                                                      init_adultProp, init_adultProp_SD,
+                                                                      carrying_capacity, 
+                                                                      pertFac.S = 1, pertFac.f = 1.2, pertFac.E = 1,
+                                                                      n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s14 <- reshape2::melt(apply(results_age_str_s14, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "20% recruitment increased")
+
+## Combine results and summarise
+simSummary_s14 <- rbind(sim_s14, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s14, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+# Calculate the probability of extinction by the end of the simulation period
+## Remove NA values
+results_no_na_s14 <- is.na(results_age_str_s14[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s14 <- mean(results_no_na_s14))
+
+#-------------------------------------------------------------------------------
+## Scenario 15
+## Low threat and good management
+## 30% increasing the recruitment rate 
+## perturbation factor "f" at 1.3
+
+# Running the simulation multiple times
+(results_age_str_s15 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                      growth_rate, growth_rate_sd,
+                                                                      survival_rate, survival_rate_sd,
+                                                                      recruitment_rate, recruitment_rate_sd,
+                                                                      init_adultProp, init_adultProp_SD,
+                                                                      carrying_capacity, 
+                                                                      pertFac.S = 1, pertFac.f = 1.3, pertFac.E = 1,
+                                                                      n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s15 <- reshape2::melt(apply(results_age_str_s15, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "30% recruitment increased")
+
+## Combine results and summarise
+simSummary_s15 <- rbind(sim_s15, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s15, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+## Comparing 3 increasing recruitment scenarios with baseline scenario
+## Combine results and summarise
+simSummary_s13t15 <- rbind(sim_s13, sim_s14, sim_s15, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s13t15, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+
+# Calculate the probability of extinction by the end of the simulation period
+## Remove NA values
+results_no_na_s15 <- is.na(results_age_str_s15[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s15 <- mean(results_no_na_s15))
+
+#-------------------------------------------------------------------------------
+## Scenario 16
+## Low threat and good management could cause low emigration
+## Therefore, the emigration rate must be decreased
+## 10% decreasing the emigration rate 
+## perturbation factor "E" at 0.9
+
+# Running the simulation multiple times
+(results_age_str_s16 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                     growth_rate, growth_rate_sd,
+                                                                     survival_rate, survival_rate_sd,
+                                                                     recruitment_rate, recruitment_rate_sd,
+                                                                     init_adultProp, init_adultProp_SD,
+                                                                     carrying_capacity, 
+                                                                     pertFac.S = 1, pertFac.f = 1, pertFac.E = 0.9,
+                                                                     n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s16 <- reshape2::melt(apply(results_age_str_s16, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "10% emigration decreased")
+
+## Combine results and summarise
+simSummary_s16 <- rbind(sim_s16, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s16, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+# Calculate the probability of extinction by the end of the simulation period
+## Remove NA values
+results_no_na_s16 <- is.na(results_age_str_s16[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s16 <- mean(results_no_na_s16))
+
+#-------------------------------------------------------------------------------
+## Scenario 17
+## Low threat and good management could cause low emigration
+## Therefore, the emigration rate must be decreased
+## 20% decreasing the emigration rate 
+## perturbation factor "E" at 0.8
+
+# Running the simulation multiple times
+(results_age_str_s17 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                      growth_rate, growth_rate_sd,
+                                                                      survival_rate, survival_rate_sd,
+                                                                      recruitment_rate, recruitment_rate_sd,
+                                                                      init_adultProp, init_adultProp_SD,
+                                                                      carrying_capacity, 
+                                                                      pertFac.S = 1, pertFac.f = 1, pertFac.E = 0.8,
+                                                                      n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s17 <- reshape2::melt(apply(results_age_str_s17, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "20% emigration decreased")
+
+## Combine results and summarise
+simSummary_s17 <- rbind(sim_s17, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s17, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+# Calculate the probability of extinction by the end of the simulation period
+## Remove NA values
+results_no_na_s17 <- is.na(results_age_str_s17[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s17 <- mean(results_no_na_s17))
+
+#-------------------------------------------------------------------------------
+## Scenario 18
+## Low threat and good management could cause low emigration
+## Therefore, the emigration rate must be decreased
+## 30% decreasing the emigration rate 
+## perturbation factor "E" at 0.7
+
+# Running the simulation multiple times
+(results_age_str_s18 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                      growth_rate, growth_rate_sd,
+                                                                      survival_rate, survival_rate_sd,
+                                                                      recruitment_rate, recruitment_rate_sd,
+                                                                      init_adultProp, init_adultProp_SD,
+                                                                      carrying_capacity, 
+                                                                      pertFac.S = 1, pertFac.f = 1, pertFac.E = 0.7,
+                                                                      n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s18 <- reshape2::melt(apply(results_age_str_s18, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "30% emigration decreased")
+
+## Combine results and summarise
+simSummary_s18 <- rbind(sim_s18, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s18, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+## Comparing 3 decreasing emigration scenarios with baseline scenario
+## Combine results and summarise
+simSummary_s16t18 <- rbind(sim_s16, sim_s17, sim_s18, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s16t18, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+# Calculate the probability of extinction by the end of the simulation period
+## Remove NA values
+results_no_na_s18 <- is.na(results_age_str_s18[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s18 <- mean(results_no_na_s18))
+
+#-------------------------------------------------------------------------------
+## Scenario 19 (additional scenario)
+## No management on land use change and still high threat (illegal-killing) could cause low survival and recruitment
+## Therefore, the survival and recruitment rate must be decreased
+## 10% decreasing both the survival and recruitment rate 
+## perturbation factor both "S and f" at 0.9
+
+# Running the simulation multiple times
+(results_age_str_s19 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                      growth_rate, growth_rate_sd,
+                                                                      survival_rate, survival_rate_sd,
+                                                                      recruitment_rate, recruitment_rate_sd,
+                                                                      init_adultProp, init_adultProp_SD,
+                                                                      carrying_capacity, 
+                                                                      pertFac.S = 0.9, pertFac.f = 0.9, pertFac.E = 1,
+                                                                      n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s19 <- reshape2::melt(apply(results_age_str_s19, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "10% survival/recruitment decreased")
+
+## Combine results and summarise
+simSummary_s19 <- rbind(sim_s19, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s19, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+# Calculate the probability of extinction by the end of the simulation period
+## Remove NA values
+results_no_na_s19 <- is.na(results_age_str_s19[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s19 <- mean(results_no_na_s19))
+
+#-------------------------------------------------------------------------------
+## Scenario 20 (additional scenario)
+## Good management on land use change and low threat (illegal-killing) could cause high survival and recruitment
+## Therefore, the survival and recruitment rate must be increased
+## 10% increasing both the survival and recruitment rate 
+## perturbation factor both "S and f" at 1.1
+
+# Running the simulation multiple times
+(results_age_str_s20 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                      growth_rate, growth_rate_sd,
+                                                                      survival_rate, survival_rate_sd,
+                                                                      recruitment_rate, recruitment_rate_sd,
+                                                                      init_adultProp, init_adultProp_SD,
+                                                                      carrying_capacity, 
+                                                                      pertFac.S = 1.1, pertFac.f = 1.1, pertFac.E = 1,
+                                                                      n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s20 <- reshape2::melt(apply(results_age_str_s20, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "10% survival/recruitment increased")
+
+## Combine results and summarise
+simSummary_s20 <- rbind(sim_s20, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s20, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+
+# Calculate the probability of extinction by the end of the simulation period
+## Remove NA values
+results_no_na_s20 <- is.na(results_age_str_s20[,n_years,] == 0)
+
+# probability of extinction
+(extinction_probability_age_str_s20 <- mean(results_no_na_s20))
+
+## Comparing 2 additional scenarios with baseline scenario
+## Combine results and summarise
+simSummary_s19t20 <- rbind(sim_s19, sim_s20, sim_4) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+## Plot
+ggplot(simSummary_s19t20, aes(x = Year, group = Model)) + 
+  geom_line(aes(y = median_N, color = Model)) + 
+  geom_ribbon(aes(ymin = lCI_N, ymax = uCI_N, fill = Model), alpha = 0.2) + 
+  xlim(1, n_years-1) + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  theme_bw()
+#-------------------------------------------------------------------------------
