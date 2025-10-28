@@ -163,3 +163,15 @@ sens_f1yr_ad <- sum(derivA_f1yr_ad*sens.ME1)
 elas_S1yr_juv <- sens_S1yr_juv * (popMat2$S1yr/lambda1)
 elas_S1yr_ad <- sens_S1yr_ad * (popMat2$S1yr/lambda1)
 elas_f1yr_ad <- sens_f1yr_ad * (popMat2$f1yr_ad/lambda1)
+
+## Compare Sensitivity and Elasticity Results
+
+Sensitivity_set <- data.frame(
+  Scenario = c("Baseline_S", "Baseline_E", "Baseline_f", "Juvenile Survival", "Adult Survival", "Recruitment"),
+  Sensitivity = c(sens_S1yr, sens_E1yr, sens_f1yr, sens_S1yr_juv, sens_S1yr_ad, sens_f1yr_ad)
+                              )
+
+Elasticity_set <- data.frame(
+  Scenario = c("Baseline_S", "Baseline_E", "Baseline_f", "Juvenile Survival", "Adult Survival", "Recruitment"),
+  Elasticity = c(elas_S1yr, elas_E1yr, elas_f1yr, elas_S1yr_juv, elas_S1yr_ad, elas_f1yr_ad)
+                              )
