@@ -41,25 +41,42 @@ popMat <- build_popMat(growth_rate = lambda, growth_rate_sd = SD_growth_rate,
                        init_adultProp = init_adultProp_mean, init_adultProp_SD = init_adultProp_SD,
                        stochastic = stochastic)
 
-A <- popMat$A
+#A <- popMat$A
 
+## Run function with 1000 simulation stochastic samples
+popMat2 <- build_popMat(growth_rate = lambda, growth_rate_sd = SD_growth_rate,
+                                              survival_rate = S, survival_rate_sd = SD_survival_rate,
+                                              recruitment_rate = f, recruitment_rate_sd = SD_recruitment,
+                                              init_adultProp = init_adultProp_mean, init_adultProp_SD = init_adultProp_SD,
+                                              stochastic = nsim)
+
+A1 <- popMat2$A
 
 # ASYMPTOTIC ANALYSIS #
 #---------------------#
 
 ## Asymptotic population growth rate 
 #  = dominant right eigenvalue of matrix
-lambda <- popbio::lambda(A)
+#lambda <- popbio::lambda(A)
 
 ## Matrix element sensitivities
 # = derivative of lambda with respect to each matrix element
 # = potential effect a small absolute change in matrix element could have on population growth rate
-sens.ME <- popbio::sensitivity(A)
+#sens.ME <- popbio::sensitivity(A)
 
 ## Matrix element elasticities (= relative sensitivities)
 # = sensitivity multiplied by (matrix element/lambda)
 # = potential effect a small relative change in matrix element could have on population growth rate
-elas.ME <- popbio::elasticity(A)
+#elas.ME <- popbio::elasticity(A)
+
+#  = dominant right eigenvalue of matrix for matrix A1
+lambda1 <- popbio::lambda(A1)
+
+## Matrix element sensitivities for matrix A1
+sens.ME1 <- popbio::sensitivity(A1)
+
+## Matrix element elasticities for matrix A1
+elas.ME1 <- popbio::elasticity(A1)
 
 
 ## Vital rate sensitivities
@@ -80,7 +97,7 @@ derivA_S1yr[2, 1] <- 1
 derivA_S1yr[2, 2] <- 1 
 derivA_S1yr[1, 2] <- 0
 
-sens_S1yr <- sum(derivA_S1yr*sens.ME)
+sens_S1yr <- sum(derivA_S1yr*sens.ME1)
 
 # Derivative matrix for E1yr
 derivA_E1yr <- matrix(NA, nrow = 2, ncol = 2)
@@ -89,7 +106,7 @@ derivA_E1yr[2, 1] <- -1
 derivA_E1yr[2, 2] <- -1
 derivA_E1yr[1, 2] <- 0
 
-sens_E1yr <- sum(derivA_E1yr*sens.ME)
+sens_E1yr <- sum(derivA_E1yr*sens.ME1)
 
 # Derivative matrix for f1yr_ad
 derivA_f1yr <- matrix(NA, nrow = 2, ncol = 2)
@@ -98,14 +115,12 @@ derivA_f1yr[2, 1] <- 0
 derivA_f1yr[2, 2] <- 0 
 derivA_f1yr[1, 2] <- 1
 
-sens_f1yr <- sum(derivA_f1yr*sens.ME)
+sens_f1yr <- sum(derivA_f1yr*sens.ME1)
 
 ## Vital rate elasticities
 # = sensitivity multiplied by (vital rate/lambda)
 # = potential effect a small relative change in vital could have on population growth rate
 
-elas_S1yr <- sens_S1yr * (popMat$S1yr/lambda)
-elas_E1yr <- sens_E1yr * (popMat$E1yr/lambda)
-elas_f1yr <- sens_f1yr * (popMat$f1yr_ad/lambda)
-
-
+elas_S1yr <- sens_S1yr * (popMat2$S1yr/lambda1)
+elas_E1yr <- sens_E1yr * (popMat2$E1yr/lambda1)
+elas_f1yr <- sens_f1yr * (popMat2$f1yr_ad/lambda1)
