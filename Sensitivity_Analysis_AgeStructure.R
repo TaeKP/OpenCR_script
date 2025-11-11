@@ -149,6 +149,27 @@ legend("topright",
        lty = c(1, 2, 3),
        lwd = 2)
 
+#---------------------#
+# Creating the for loop to run matrix element sensitivities with 1000 simulations
+# Creating list to store sensitivity matrices
+sens_results <- vector("list", dim(nsim_array)[3])
+
+for (k in 1:dim(nsim_array)[3]) {
+  mat <- nsim_array[,,k]
+  sens_results[[k]] <- sensitivity(mat)
+}
+
+# Checking slice 1
+print(sens_results[[1]])
+
+# sensitivity of element (1,1) in every slice
+s11 <- sapply(sens_results, function(x) x[1,1])
+print(s11)
+
+(s12 <- sapply(sens_results, function(x) x[1,2]))
+(s21 <- sapply(sens_results, function(x) x[2,1]))
+(s22 <- sapply(sens_results, function(x) x[2,2]))
+
 ## ----------------------------------------------------------------------------------------
 
 ## Vital rate sensitivities
