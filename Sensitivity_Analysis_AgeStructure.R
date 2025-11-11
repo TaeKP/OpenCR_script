@@ -170,6 +170,27 @@ print(s11)
 (s21 <- sapply(sens_results, function(x) x[2,1]))
 (s22 <- sapply(sens_results, function(x) x[2,2]))
 
+#---------------------#
+# Creating the for loop to run matrix element elasticities with 1000 simulations
+# Creating list to store elasticity
+elas_results <- vector("list", dim(nsim_array)[3])
+
+for (k in 1:dim(nsim_array)[3]) {
+  mat <- nsim_array[,,k]
+  elas_results[[k]] <- elasticity(mat)
+}
+
+# # Checking slice 1
+print(elas_results[[1]])
+
+# elasticity of element (1,1) in every slice
+e11 <- sapply(elas_results, function(x) x[1,1])
+print(e11)
+
+(e12 <- sapply(elas_results, function(x) x[1,2]))
+(e21 <- sapply(elas_results, function(x) x[2,1]))
+(e22 <- sapply(elas_results, function(x) x[2,2]))
+
 ## ----------------------------------------------------------------------------------------
 
 ## Vital rate sensitivities
