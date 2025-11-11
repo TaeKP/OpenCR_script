@@ -102,6 +102,54 @@ sens.ME <- popbio::sensitivity(A)
 # = potential effect a small relative change in matrix element could have on population growth rate
 elas.ME <- popbio::elasticity(A)
 
+#---------------------#
+# Creating the for loop to calculate lambda with 1000 simulations
+# Creating vector to store lambda
+lambda_values <- numeric(dim(nsim_array)[3])
+
+# Using for loop to calculate lambda from each matrix
+for (k in 1:dim(nsim_array)[3]) {
+  mat <- nsim_array[,,k]
+  lambda_values[k] <- lambda(mat)   
+}
+
+# Checking lambda result
+print(lambda_values)
+
+# mean
+mean_lambda <- mean(lambda_values)
+
+# standard deviation
+sd_lambda <- sd(lambda_values)
+
+# SE (standard error) = sd / sqrt(n)
+se_lambda <- sd_lambda / sqrt(length(lambda_values))
+
+# 95% CI
+ci_lower <- mean_lambda - 1.96 * se_lambda
+ci_upper <- mean_lambda + 1.96 * se_lambda
+
+# creating density plot
+plot(density(lambda_values),
+     main = "Density Plot of Lambda with Mean & 95% CI",
+     xlab = "Lambda",
+     col = "blue",
+     lwd = 2)
+
+# adding mean
+abline(v = mean_lambda, col = "red", lwd = 2, lty = 2)
+
+# adding 95% CI
+abline(v = ci_lower, col = "darkgreen", lwd = 2, lty = 3)
+abline(v = ci_upper, col = "darkgreen", lwd = 2, lty = 3)
+
+legend("topright",
+       legend = c("Density", "Mean", "95% CI"),
+       col = c("blue", "red", "darkgreen"),
+       lty = c(1, 2, 3),
+       lwd = 2)
+
+## ----------------------------------------------------------------------------------------
 
 ## Vital rate sensitivities
 # = derivative of lambda with respect to each vital rate
