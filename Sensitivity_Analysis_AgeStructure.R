@@ -235,57 +235,6 @@ sens_f1yr <- sum(derivA_f1yr*sens.ME)
 # = sensitivity multiplied by (vital rate/lambda)
 # = potential effect a small relative change in vital could have on population growth rate
 
-elas_S1yr <- sens_S1yr * (popMat2$S1yr/lambda1)
-elas_E1yr <- sens_E1yr * (popMat2$E1yr/lambda1)
-elas_f1yr <- sens_f1yr * (popMat2$f1yr_ad/lambda1)
-
-## ----------------------------------------------------------------------------------------
-## Set up the scenarios with the matrix perturbation 
-
-# Scenarios 1. Reduce 5% juvenile survival
-# Derivative matrix for S1yr_juv
-derivA_S1yr_juv <- matrix(NA, nrow = 2, ncol = 2)
-derivA_S1yr_juv[1, 1] <- 0 
-derivA_S1yr_juv[2, 1] <- 1 * 0.95
-derivA_S1yr_juv[2, 2] <- 1 
-derivA_S1yr_juv[1, 2] <- 0
-
-sens_S1yr_juv <- sum(derivA_S1yr_juv*sens.ME1)
-
-# Scenarios 2. Reduce 5% adult survival
-# Derivative matrix for S1yr_ad
-derivA_S1yr_ad <- matrix(NA, nrow = 2, ncol = 2)
-derivA_S1yr_ad[1, 1] <- 0 
-derivA_S1yr_ad[2, 1] <- 1 
-derivA_S1yr_ad[2, 2] <- 1 * 0.95
-derivA_S1yr_ad[1, 2] <- 0
-
-sens_S1yr_ad <- sum(derivA_S1yr_ad*sens.ME1)
-
-# Scenarios 3. Reduce 5% adult recruitment
-# Derivative matrix for f1yr_ad
-derivA_f1yr_ad <- matrix(NA, nrow = 2, ncol = 2)
-derivA_f1yr_ad[1, 1] <- 0 
-derivA_f1yr_ad[2, 1] <- 0 
-derivA_f1yr_ad[2, 2] <- 0 
-derivA_f1yr_ad[1, 2] <- 1 * 0.95
-
-sens_f1yr_ad <- sum(derivA_f1yr_ad*sens.ME1)
-
-## Vital rate elasticities for 3 scenarios
-
-elas_S1yr_juv <- sens_S1yr_juv * (popMat2$S1yr/lambda1)
-elas_S1yr_ad <- sens_S1yr_ad * (popMat2$S1yr/lambda1)
-elas_f1yr_ad <- sens_f1yr_ad * (popMat2$f1yr_ad/lambda1)
-
-## Compare Sensitivity and Elasticity Results
-
-Sensitivity_set <- data.frame(
-  Scenario = c("Baseline_S", "Baseline_E", "Baseline_f", "Juvenile Survival", "Adult Survival", "Recruitment"),
-  Sensitivity = c(sens_S1yr, sens_E1yr, sens_f1yr, sens_S1yr_juv, sens_S1yr_ad, sens_f1yr_ad)
-                              )
-
-Elasticity_set <- data.frame(
-  Scenario = c("Baseline_S", "Baseline_E", "Baseline_f", "Juvenile Survival", "Adult Survival", "Recruitment"),
-  Elasticity = c(elas_S1yr, elas_E1yr, elas_f1yr, elas_S1yr_juv, elas_S1yr_ad, elas_f1yr_ad)
-                              )
+elas_S1yr <- sens_S1yr * (popMat$S1yr/lambda)
+elas_E1yr <- sens_E1yr * (popMat$E1yr/lambda)
+elas_f1yr <- sens_f1yr * (popMat$f1yr_ad/lambda)
