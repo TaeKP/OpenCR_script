@@ -238,3 +238,51 @@ sens_f1yr <- sum(derivA_f1yr*sens.ME)
 elas_S1yr <- sens_S1yr * (popMat$S1yr/lambda)
 elas_E1yr <- sens_E1yr * (popMat$E1yr/lambda)
 elas_f1yr <- sens_f1yr * (popMat$f1yr_ad/lambda)
+
+## ----------------------------------------------------------------------------------------
+## Vital rate sensitivities for 1000 samples
+
+## 1.1 Vital rate sensitivity for survival
+# Using "lapply" function for list object, then obtained the sens_results (1000 samples) 
+# multiply by the derivative of matrix A for survival (S1yr) (1 matrix) and using sum function to calculate each value in each slice
+
+# Multiply each matrix in the list by derivA_S1yr
+# get 1000 values of sens_S1yr_sims from sum function
+sens_S1yr_sims <- lapply(sens_results, function(x) sum(derivA_S1yr %*% x))
+
+# This is sensitivity of survival from 1000 samples
+sens_S1yr_sims
+
+## 1.2 Estimating the elasticity for the Survival
+# Indexing the list object to extract the "S1yr" from the result_popMat
+# indexing of each matrix; first 10 slices
+result_popMat[c(2, 8, 14, 20, 26, 32, 38, 44, 50, 56)]
+
+# Define the position of each S1yr to extract the values from result_popMat
+selected_S1 <-seq(2, length(result_popMat), by = 6)
+selected_S1
+
+# Building the object for the S1yr values
+result_S1 <- result_popMat[selected_S1]
+result_S1
+
+# Checking the structure of result_S1 for list object include 1000 values
+str(result_S1)
+
+# Initialize empty list to store results
+elas_S1yr_sims <- vector("list", length = 1000)
+
+# Loop through positions
+for (i in seq_along(sens_S1yr_sims)) {
+  elas_S1yr_sims[[i]] <- sens_S1yr_sims[[i]] * (result_S1[[i]] / lambda_values[i])
+}
+
+# This is elasticity of survival from 1000 samples
+elas_S1yr_sims
+
+
+
+
+
+
+
