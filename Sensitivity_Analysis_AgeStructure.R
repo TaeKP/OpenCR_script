@@ -319,3 +319,47 @@ for (i in seq_along(sens_E1yr_sims)) {
 # This is elasticity of emigration from 1000 samples
 elas_E1yr_sims
 
+## -----------------------------------------
+## 3.1 Vital rate sensitivities for recruitment
+# Using "lapply" function for list object, then obtained the sens_results (1000 samples) 
+# multiply by the derivative of matrix A for recruitment (f1yr_ad) (1 matrix)
+
+# Multiply each matrix in the list by derivA_f1yr
+sens_f_samples <- lapply(sens_results, function(x) derivA_f1yr %*% x)
+sens_f_samples
+
+# get 1000 values which extract only element [1,2] for adult recruitment
+sens_f1yr_sims <- sapply(sens_f_samples, function(x) x[1, 2])
+
+length(sens_f1yr_sims)  # must be 1000
+
+# This is sensitivity of recruitment from 1000 samples
+sens_f1yr_sims
+
+## 3.2 Estimating the elasticity for the Recruitment
+# Indexing the list object to extract the "f1yr_ad" from the result_popMat
+# indexing of each matrix; first 10 slices
+result_popMat[c(4, 10, 16, 22, 28, 34, 40, 46, 52, 58)]
+
+# Define the position of each f1yr_ad to extract the values from result_popMat
+selected_f1 <-seq(4, length(result_popMat), by = 6)
+selected_f1
+
+# Building the object for the f1yr_ad values
+result_f1 <- result_popMat[selected_f1]
+result_f1
+
+# Checking the structure of result_f1 for list object include 1000 values
+str(result_f1)
+
+# Initialize empty list to store results
+elas_f1yr_sims <- vector("list", length = 1000)
+
+# Loop through positions
+for (i in seq_along(sens_f1yr_sims)) {
+  elas_f1yr_sims[[i]] <- sens_f1yr_sims[[i]] * (result_f1[[i]] / lambda_values[i])
+}
+
+# This is elasticity of recruitment from 1000 samples
+elas_f1yr_sims
+
