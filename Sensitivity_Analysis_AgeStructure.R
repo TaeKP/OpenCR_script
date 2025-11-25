@@ -280,9 +280,42 @@ for (i in seq_along(sens_S1yr_sims)) {
 # This is elasticity of survival from 1000 samples
 elas_S1yr_sims
 
+## -----------------------------------------
+## 2.1 Vital rate sensitivities for emigration
+# Using "lapply" function for list object, then obtained the sens_results (1000 samples) 
+# multiply by the derivative of matrix A for emigration (E1yr) (1 matrix)
 
+# Multiply each matrix in the list by derivA_E1yr
+# get 1000 values of sens_E1yr_sims from sum function
+sens_E1yr_sims <- lapply(sens_results, function(x) sum(derivA_E1yr %*% x))
 
+# This is sensitivity of emigration from 1000 samples
+sens_E1yr_sims
 
+## 2.2 Estimating the elasticity for the Emigration
+# Indexing the list object to extract the "E1yr" from the result_popMat
+# indexing of each matrix; first 10 slices
+result_popMat[c(5, 11, 17, 23, 29, 35, 41, 47, 53, 59)]
 
+# Define the position of each E1yr to extract the values from result_popMat
+selected_E1 <-seq(5, length(result_popMat), by = 6)
+selected_E1
 
+# Building the object for the E1yr values
+result_E1 <- result_popMat[selected_E1]
+result_E1
+
+# Checking the structure of result_E1 for list object include 1000 values
+str(result_E1)
+
+# Initialize empty list to store results
+elas_E1yr_sims <- vector("list", length = 1000)
+
+# Loop through positions
+for (i in seq_along(sens_E1yr_sims)) {
+  elas_E1yr_sims[[i]] <- sens_E1yr_sims[[i]] * (result_E1[[i]] / lambda_values[i])
+}
+
+# This is elasticity of emigration from 1000 samples
+elas_E1yr_sims
 
