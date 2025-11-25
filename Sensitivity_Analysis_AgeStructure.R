@@ -431,4 +431,39 @@ for (i in seq_along(sens_perAS_sims)) {
 # This is elasticity of perturbation Adult survival from 1000 samples
 elas_perAS_sims
 
+## -----------------------------------------
+# 6.1 Scenarios 3. Reduce 5% Adult recruitment
+# Derivative matrix for f1yr_ad
+derivA_f1yr_ad <- matrix(NA, nrow = 2, ncol = 2)
+derivA_f1yr_ad[1, 1] <- 0
+derivA_f1yr_ad[2, 1] <- 0 
+derivA_f1yr_ad[2, 2] <- 0 
+derivA_f1yr_ad[1, 2] <- 1 * per_fact
 
+derivA_f1yr_ad
+
+# Using "lapply" function for list object, then obtained the sens_results (1000 samples) 
+# multiply by the derivative of matrix A for Adult recruitment (f1yr_ad) (1 matrix)
+
+sens_perf_samples <- lapply(sens_results, function(x) derivA_f1yr_ad %*% x)
+sens_perf_samples
+
+# get 1000 values which extract only element [1,2] for perturbed adult recruitment
+sens_perf_sims <- sapply(sens_perf_samples, function(x) x[1, 2])
+
+length(sens_perf_sims)  # must be 1000
+
+# This is sensitivity of perturbation adult recruitment from 1000 samples
+sens_perf_sims
+
+# 6.2 Estimating the elasticity for the perturbation Adult recruitment
+# Initialize empty list to store results
+elas_perf_sims <- vector("list", length = 1000)
+
+# Loop through positions
+for (i in seq_along(sens_perf_sims)) {
+  elas_perf_sims[[i]] <- sens_perf_sims[[i]] * (result_f1[[i]] / lambda_values[i])
+}
+
+# This is elasticity of perturbation Adult recruitment from 1000 samples
+elas_perf_sims
