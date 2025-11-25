@@ -400,14 +400,35 @@ for (i in seq_along(sens_perJS_sims)) {
 # This is elasticity of perturbation Juvenile survival from 1000 samples
 elas_perJS_sims
 
+## -----------------------------------------
+# 5.1 Scenarios 2. Reduce 5% Adult survival
+# Derivative matrix for S1yr_ad
+derivA_S1yr_ad <- matrix(NA, nrow = 2, ncol = 2)
+derivA_S1yr_ad[1, 1] <- 0 
+derivA_S1yr_ad[2, 1] <- 1 
+derivA_S1yr_ad[2, 2] <- 1 * per_fact
+derivA_S1yr_ad[1, 2] <- 0
 
+derivA_S1yr_ad
 
+# Using "lapply" function for list object, then obtained the sens_results (1000 samples) 
+# multiply by the derivative of matrix A for Adult survival (S1yr_ad) (1 matrix)
 
+sens_perAS_sims <- lapply(sens_results, function(x) sum(derivA_S1yr_ad %*% x))
 
+# This is sensitivity of adult survival from 1000 samples
+sens_perAS_sims
 
+# 5.2 Estimating the elasticity for the perturbation Adult survival
+# Initialize empty list to store results
+elas_perAS_sims <- vector("list", length = 1000)
 
+# Loop through positions
+for (i in seq_along(sens_perAS_sims)) {
+  elas_perAS_sims[[i]] <- sens_perAS_sims[[i]] * (result_S1[[i]] / lambda_values[i])
+}
 
-
-
+# This is elasticity of perturbation Adult survival from 1000 samples
+elas_perAS_sims
 
 
