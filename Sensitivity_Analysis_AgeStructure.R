@@ -497,6 +497,68 @@ ggplot(df_vec_elas_f1yr_sims, aes(x = value)) +
 mean_elas_f1yr_sims <- mean(df_vec_elas_f1yr_sims$value)
 mean_elas_f1yr_sims
 
+## compare the 3 sensitivity models
+# makes data frame for 3 sensitivity models
+df_all_sens_models <- data.frame(
+  value = c(vec_sens_S1yr_sims, vec_sens_E1yr_sims, vec_sens_f1yr_sims),
+  model = rep(c("Model S", "Model E", "Model f"), each = 1000)
+)
+
+df_all_sens_models
+
+# calculate the mean value for each model
+library(dplyr)
+means_sens <- df_all_sens_models %>%
+  group_by(model) %>%
+  summarise(mean_val = mean(value), .groups = "drop")
+
+# Plot densities together with each mean line
+ggplot(df_all_sens_models, aes(x = value, colour = model, fill = model)) +
+  geom_density(alpha = 0.3, linewidth = 0.5) +
+  xlim(-3, 3) +
+  scale_colour_grey(start = 0.2, end = 0.8) +   # line colours from dark to light grey
+  scale_fill_grey(start = 0.8, end = 0.2) +     # fill shades reversed for contrast
+  theme_minimal(base_size = 13) +
+  theme(
+    axis.line = element_line(color = "black")  # keep axis lines
+  ) +
+  geom_hline(yintercept = 0, colour = "black") +
+  geom_vline(data = means_sens, aes(xintercept = mean_val, linetype = model),
+             colour = "black", linewidth = 0.1)+
+  scale_y_continuous(expand = c(0,0)) +
+  labs(title = "Density comparison of 3 sensitivity models",
+       x = "Value", y = "Density")
+
+# makes data frame for 3 elasticity models
+df_all_elas_models <- data.frame(
+  value = c(vec_elas_S1yr_sims, vec_elas_E1yr_sims, vec_elas_f1yr_sims),
+  model = rep(c("Model S", "Model E", "Model f"), each = 1000)
+)
+
+df_all_elas_models
+
+# calculate the mean value for each model
+means_elas <- df_all_elas_models %>%
+  group_by(model) %>%
+  summarise(mean_val = mean(value), .groups = "drop")
+
+# Plot densities together with each mean line
+ggplot(df_all_elas_models, aes(x = value, colour = model, fill = model)) +
+  geom_density(alpha = 0.3, linewidth = 0.5) +
+  xlim(-3, 3) +
+  scale_colour_grey(start = 0.2, end = 0.8) +   # line colours from dark to light grey
+  scale_fill_grey(start = 0.8, end = 0.2) +     # fill shades reversed for contrast
+  theme_minimal(base_size = 13) +
+  theme(
+    axis.line = element_line(color = "black")  # keep axis lines
+  ) +
+  geom_vline(data = means_elas, aes(xintercept = mean_val, linetype = model),
+             colour = "black", linewidth = 0.1)+
+  geom_hline(yintercept = 0, colour = "black") +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(title = "Density comparison of 3 elasticity models",
+       x = "Value", y = "Density")
+
 ## ----------------------------------------------------------------------------------------
 ## Set up the scenarios with the matrix perturbation
 # Set up the value for perturbation
