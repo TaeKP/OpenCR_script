@@ -855,3 +855,33 @@ ggplot(df_all_per_elas_models, aes(x = value, colour = model, fill = model)) +
   scale_y_continuous(expand = c(0,0)) +
   labs(title = "Density comparison of 3 perturbation elasticity models",
        x = "Value", y = "Density")
+
+## Make the table of vital rate sensitivity and elasticity for baseline models
+sens_base_set <- data.frame(
+  Sensitivity = c("Survival", "Emigration", "Recruitment"),
+  Value = c(mean_sens_S1yr_sims, mean_sens_E1yr_sims, mean_sens_f1yr_sims)
+)
+
+sens_base_set
+
+elas_base_set <- data.frame(
+  Elasticity = c("Survival", "Emigration", "Recruitment"),
+  Value = c(mean_elas_S1yr_sims, mean_elas_E1yr_sims, mean_elas_f1yr_sims)
+)
+
+elas_base_set
+
+## Make the table of vital rate sensitivity and elasticity for perturbation models
+sens_per_set <- data.frame(
+  Sensitivity = c("Juvenile Survival", "Adult Survival", "Adult Recruitment"),
+  Value = c(mean_sens_perJS_sims, mean_sens_perAS_sims, mean_sens_perf_sims)
+)
+
+sens_per_set
+
+elas_per_set <- data.frame(
+  Elasticity = c("Juvenile Survival", "Adult Survival", "Adult Recruitment"),
+  Value = c(mean_elas_perJS_sims, mean_elas_perAS_sims, mean_elas_perf_sims)
+)
+
+elas_per_set
