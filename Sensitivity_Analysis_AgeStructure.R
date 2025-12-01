@@ -596,6 +596,50 @@ for (i in seq_along(sens_perJS_sims)) {
 # This is elasticity of perturbation Juvenile survival from 1000 samples
 elas_perJS_sims
 
+# Plot the density of sensitivity of perturbation Juvenile survival
+# Flatten into a numeric vector
+vec_sens_perJS_sims <- unlist(sens_perJS_sims)
+
+# make dataframe
+df_vec_sens_perJS_sims <- data.frame(value = vec_sens_perJS_sims)
+
+ggplot(df_vec_sens_perJS_sims, aes(x = value)) +
+  geom_density(fill = "skyblue", alpha = 0.4, colour = "blue") +
+  xlim(-5, 5) +
+  theme(
+    axis.line = element_line(color = "black")  # keep axis lines
+  ) +
+  geom_hline(yintercept = 0, colour = "black") +
+  scale_y_continuous(expand = c(0,0)) +
+  geom_vline(xintercept = mean(df_vec_sens_perJS_sims$value), colour = "red", linetype = "dashed") +
+  labs(title = "Density plot of sensitivity of perturbation Juvenile survival")
+
+# mean
+mean_sens_perJS_sims <- mean(df_vec_sens_perJS_sims$value)
+mean_sens_perJS_sims
+
+# Plot the density of elasticity of perturbation Juvenile survival
+# Flatten into a numeric vector
+vec_elas_perJS_sims <- unlist(elas_perJS_sims)
+
+# make dataframe
+df_vec_elas_perJS_sims <- data.frame(value = vec_elas_perJS_sims)
+
+ggplot(df_vec_elas_perJS_sims, aes(x = value)) +
+  geom_density(fill = "skyblue", alpha = 0.4, colour = "blue") +
+  xlim(-5, 5) +
+  theme(
+    axis.line = element_line(color = "black")  # keep axis lines
+  ) +
+  geom_hline(yintercept = 0, colour = "black") +
+  scale_y_continuous(expand = c(0,0)) +
+  geom_vline(xintercept = mean(df_vec_elas_perJS_sims$value), colour = "red", linetype = "dashed") +
+  labs(title = "Density plot of elasticity of perturbation Juvenile survival")
+
+# mean
+mean_elas_perJS_sims <- mean(df_vec_elas_perJS_sims$value)
+mean_elas_perJS_sims
+
 ## -----------------------------------------
 # 5.1 Scenarios 2. Reduce 5% Adult survival
 # Derivative matrix for S1yr_ad
@@ -626,6 +670,50 @@ for (i in seq_along(sens_perAS_sims)) {
 
 # This is elasticity of perturbation Adult survival from 1000 samples
 elas_perAS_sims
+
+# Plot the density of sensitivity of perturbation Adult survival
+# Flatten into a numeric vector
+vec_sens_perAS_sims <- unlist(sens_perAS_sims)
+
+# make dataframe
+df_vec_sens_perAS_sims <- data.frame(value = vec_sens_perAS_sims)
+
+ggplot(df_vec_sens_perAS_sims, aes(x = value)) +
+  geom_density(fill = "skyblue", alpha = 0.4, colour = "blue") +
+  xlim(-5, 5) +
+  theme(
+    axis.line = element_line(color = "black")  # keep axis lines
+  ) +
+  geom_hline(yintercept = 0, colour = "black") +
+  scale_y_continuous(expand = c(0,0)) +
+  geom_vline(xintercept = mean(df_vec_sens_perAS_sims$value), colour = "red", linetype = "dashed") +
+  labs(title = "Density plot of sensitivity of perturbation Adult survival")
+
+# mean
+mean_sens_perAS_sims <- mean(df_vec_sens_perAS_sims$value)
+mean_sens_perAS_sims
+
+# Plot the density of elasticity of perturbation Adult survival
+# Flatten into a numeric vector
+vec_elas_perAS_sims <- unlist(elas_perAS_sims)
+
+# make dataframe
+df_vec_elas_perAS_sims <- data.frame(value = vec_elas_perAS_sims)
+
+ggplot(df_vec_elas_perAS_sims, aes(x = value)) +
+  geom_density(fill = "skyblue", alpha = 0.4, colour = "blue") +
+  xlim(-5, 5) +
+  theme(
+    axis.line = element_line(color = "black")  # keep axis lines
+  ) +
+  geom_hline(yintercept = 0, colour = "black") +
+  scale_y_continuous(expand = c(0,0)) +
+  geom_vline(xintercept = mean(df_vec_elas_perAS_sims$value), colour = "red", linetype = "dashed") +
+  labs(title = "Density plot of elasticity of perturbation Adult survival")
+
+# mean
+mean_elas_perAS_sims <- mean(df_vec_elas_perAS_sims$value)
+mean_elas_perAS_sims
 
 ## -----------------------------------------
 # 6.1 Scenarios 3. Reduce 5% Adult recruitment
@@ -663,3 +751,47 @@ for (i in seq_along(sens_perf_sims)) {
 
 # This is elasticity of perturbation Adult recruitment from 1000 samples
 elas_perf_sims
+
+# Plot the density of sensitivity of perturbation Adult recruitment
+# Flatten into a numeric vector
+vec_sens_perf_sims <- unlist(sens_perf_sims)
+
+# make dataframe
+df_vec_sens_perf_sims <- data.frame(value = vec_sens_perf_sims)
+
+ggplot(df_vec_sens_perf_sims, aes(x = value)) +
+  geom_density(fill = "skyblue", alpha = 0.4, colour = "blue") +
+  xlim(-5, 5) +
+  theme(
+    axis.line = element_line(color = "black")  # keep axis lines
+  ) +
+  geom_hline(yintercept = 0, colour = "black") +
+  scale_y_continuous(expand = c(0,0)) +
+  geom_vline(xintercept = mean(df_vec_sens_perf_sims$value), colour = "red", linetype = "dashed") +
+  labs(title = "Density plot of sensitivity of perturbation Adult recruitment")
+
+# mean
+mean_sens_perf_sims <- mean(df_vec_sens_perf_sims$value)
+mean_sens_perf_sims
+
+# Plot the density of elasticity of perturbation Adult recruitment
+# Flatten into a numeric vector
+vec_elas_perf_sims <- unlist(elas_perf_sims)
+
+# make dataframe
+df_vec_elas_perf_sims <- data.frame(value = vec_elas_perf_sims)
+
+ggplot(df_vec_elas_perf_sims, aes(x = value)) +
+  geom_density(fill = "skyblue", alpha = 0.4, colour = "blue") +
+  xlim(-5, 5) +
+  theme(
+    axis.line = element_line(color = "black")  # keep axis lines
+  ) +
+  geom_hline(yintercept = 0, colour = "black") +
+  scale_y_continuous(expand = c(0,0)) +
+  geom_vline(xintercept = mean(df_vec_elas_perf_sims$value), colour = "red", linetype = "dashed") +
+  labs(title = "Density plot of elasticity of perturbation Adult recruitment")
+
+# mean
+mean_elas_perf_sims <- mean(df_vec_elas_perf_sims$value)
+mean_elas_perf_sims
