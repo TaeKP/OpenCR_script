@@ -365,6 +365,50 @@ for (i in seq_along(sens_E1yr_sims)) {
 # This is elasticity of emigration from 1000 samples
 elas_E1yr_sims
 
+# Plot the density of sensitivity of emigration
+# Flatten into a numeric vector
+vec_sens_E1yr_sims <- unlist(sens_E1yr_sims)
+
+# make dataframe
+df_vec_sens_E1yr_sims <- data.frame(value = vec_sens_E1yr_sims)
+
+ggplot(df_vec_sens_E1yr_sims, aes(x = value)) +
+  geom_density(fill = "skyblue", alpha = 0.4, colour = "blue") +
+  xlim(-5, 5) +
+  theme(
+    axis.line = element_line(color = "black")  # keep axis lines
+  ) +
+  geom_hline(yintercept = 0, colour = "black") +
+  scale_y_continuous(expand = c(0,0)) +
+  geom_vline(xintercept = mean(df_vec_sens_E1yr_sims$value), colour = "red", linetype = "dashed") +
+  labs(title = "Density plot of sensitivity of emigration")
+
+# mean
+mean_sens_E1yr_sims <- mean(df_vec_sens_E1yr_sims$value)
+mean_sens_E1yr_sims
+
+# Plot the density of elasticity of emigration
+# Flatten into a numeric vector
+vec_elas_E1yr_sims <- unlist(elas_E1yr_sims)
+
+# make dataframe
+df_vec_elas_E1yr_sims <- data.frame(value = vec_elas_E1yr_sims)
+
+ggplot(df_vec_elas_E1yr_sims, aes(x = value)) +
+  geom_density(fill = "skyblue", alpha = 0.4, colour = "blue") +
+  xlim(-5, 5) +
+  theme(
+    axis.line = element_line(color = "black")  # keep axis lines
+  ) +
+  geom_hline(yintercept = 0, colour = "black") +
+  scale_y_continuous(expand = c(0,0)) +
+  geom_vline(xintercept = mean(df_vec_elas_E1yr_sims$value), colour = "red", linetype = "dashed") +
+  labs(title = "Density plot of elasticity of emigration")
+
+# mean
+mean_elas_E1yr_sims <- mean(df_vec_elas_E1yr_sims$value)
+mean_elas_E1yr_sims
+
 ## -----------------------------------------
 ## 3.1 Vital rate sensitivities for recruitment
 # Using "lapply" function for list object, then obtained the sens_results (1000 samples) 
