@@ -702,6 +702,20 @@ ggplot(df_vec_sens_perJS_sims, aes(x = value)) +
 mean_sens_perJS_sims <- mean(df_vec_sens_perJS_sims$value)
 mean_sens_perJS_sims
 
+# standard deviation
+sd_sens_perJS_sims <- sd(df_vec_sens_perJS_sims$value)
+sd_sens_perJS_sims
+
+# SE (standard error) = sd / sqrt(n)
+se_sens_perJS_sims <- sd_sens_perJS_sims / sqrt(length(df_vec_sens_perJS_sims$value))
+se_sens_perJS_sims
+
+# 95% CI
+ci_lower_sens_perJS_sims <- mean_sens_perJS_sims - 1.96 * se_sens_perJS_sims
+ci_lower_sens_perJS_sims
+ci_upper_sens_perJS_sims <- mean_sens_perJS_sims + 1.96 * se_sens_perJS_sims
+ci_upper_sens_perJS_sims
+
 # Plot the density of elasticity of perturbation Juvenile survival
 # Flatten into a numeric vector
 vec_elas_perJS_sims <- unlist(elas_perJS_sims)
@@ -723,6 +737,20 @@ ggplot(df_vec_elas_perJS_sims, aes(x = value)) +
 # mean
 mean_elas_perJS_sims <- mean(df_vec_elas_perJS_sims$value)
 mean_elas_perJS_sims
+
+# standard deviation
+sd_elas_perJS_sims <- sd(df_vec_elas_perJS_sims$value)
+sd_elas_perJS_sims
+
+# SE (standard error) = sd / sqrt(n)
+se_elas_perJS_sims <- sd_elas_perJS_sims / sqrt(length(df_vec_elas_perJS_sims$value))
+se_elas_perJS_sims
+
+# 95% CI
+ci_lower_elas_perJS_sims <- mean_elas_perJS_sims - 1.96 * se_elas_perJS_sims
+ci_lower_elas_perJS_sims
+ci_upper_elas_perJS_sims <- mean_elas_perJS_sims + 1.96 * se_elas_perJS_sims
+ci_upper_elas_perJS_sims
 
 ## -----------------------------------------
 # 5.1 Scenarios 2. Reduce 5% Adult survival
@@ -777,6 +805,20 @@ ggplot(df_vec_sens_perAS_sims, aes(x = value)) +
 mean_sens_perAS_sims <- mean(df_vec_sens_perAS_sims$value)
 mean_sens_perAS_sims
 
+# standard deviation
+sd_sens_perAS_sims <- sd(df_vec_sens_perAS_sims$value)
+sd_sens_perAS_sims
+
+# SE (standard error) = sd / sqrt(n)
+se_sens_perAS_sims <- sd_sens_perAS_sims / sqrt(length(df_vec_sens_perAS_sims$value))
+se_sens_perAS_sims
+
+# 95% CI
+ci_lower_sens_perAS_sims <- mean_sens_perAS_sims - 1.96 * se_sens_perAS_sims
+ci_lower_sens_perAS_sims
+ci_upper_sens_perAS_sims <- mean_sens_perAS_sims + 1.96 * se_sens_perAS_sims
+ci_upper_sens_perAS_sims
+
 # Plot the density of elasticity of perturbation Adult survival
 # Flatten into a numeric vector
 vec_elas_perAS_sims <- unlist(elas_perAS_sims)
@@ -798,6 +840,20 @@ ggplot(df_vec_elas_perAS_sims, aes(x = value)) +
 # mean
 mean_elas_perAS_sims <- mean(df_vec_elas_perAS_sims$value)
 mean_elas_perAS_sims
+
+# standard deviation
+sd_elas_perAS_sims <- sd(df_vec_elas_perAS_sims$value)
+sd_elas_perAS_sims
+
+# SE (standard error) = sd / sqrt(n)
+se_elas_perAS_sims <- sd_elas_perAS_sims / sqrt(length(df_vec_elas_perAS_sims$value))
+se_elas_perAS_sims
+
+# 95% CI
+ci_lower_elas_perAS_sims <- mean_elas_perAS_sims - 1.96 * se_elas_perAS_sims
+ci_lower_elas_perAS_sims
+ci_upper_elas_perAS_sims <- mean_elas_perAS_sims + 1.96 * se_elas_perAS_sims
+ci_upper_elas_perAS_sims
 
 ## -----------------------------------------
 # 6.1 Scenarios 3. Reduce 5% Adult recruitment
@@ -858,6 +914,20 @@ ggplot(df_vec_sens_perf_sims, aes(x = value)) +
 mean_sens_perf_sims <- mean(df_vec_sens_perf_sims$value)
 mean_sens_perf_sims
 
+# standard deviation
+sd_sens_perf_sims <- sd(df_vec_sens_perf_sims$value)
+sd_sens_perf_sims
+
+# SE (standard error) = sd / sqrt(n)
+se_sens_perf_sims <- sd_sens_perf_sims / sqrt(length(df_vec_sens_perf_sims$value))
+se_sens_perf_sims
+
+# 95% CI
+ci_lower_sens_perf_sims <- mean_sens_perf_sims - 1.96 * se_sens_perf_sims
+ci_lower_sens_perf_sims
+ci_upper_sens_perf_sims <- mean_sens_perf_sims + 1.96 * se_sens_perf_sims
+ci_upper_sens_perf_sims
+
 # Plot the density of elasticity of perturbation Adult recruitment
 # Flatten into a numeric vector
 vec_elas_perf_sims <- unlist(elas_perf_sims)
@@ -879,6 +949,20 @@ ggplot(df_vec_elas_perf_sims, aes(x = value)) +
 # mean
 mean_elas_perf_sims <- mean(df_vec_elas_perf_sims$value)
 mean_elas_perf_sims
+
+# standard deviation
+sd_elas_perf_sims <- sd(df_vec_elas_perf_sims$value)
+sd_elas_perf_sims
+
+# SE (standard error) = sd / sqrt(n)
+se_elas_perf_sims <- sd_elas_perf_sims / sqrt(length(df_vec_elas_perf_sims$value))
+se_elas_perf_sims
+
+# 95% CI
+ci_lower_elas_perf_sims <- mean_elas_perf_sims - 1.96 * se_elas_perf_sims
+ci_lower_elas_perf_sims
+ci_upper_elas_perf_sims <- mean_elas_perf_sims + 1.96 * se_elas_perf_sims
+ci_upper_elas_perf_sims
 
 ## Makes data frame for 3 perturbation sensitivity models
 df_all_per_sens_models <- data.frame(
