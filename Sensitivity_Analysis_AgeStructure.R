@@ -304,6 +304,20 @@ ggplot(df_vec_sens_S1yr_sims, aes(x = value)) +
 mean_sens_S1yr_sims <- mean(df_vec_sens_S1yr_sims$value)
 mean_sens_S1yr_sims
 
+# standard deviation
+sd_sens_S1yr_sims <- sd(df_vec_sens_S1yr_sims$value)
+sd_sens_S1yr_sims
+
+# SE (standard error) = sd / sqrt(n)
+se_sens_S1yr_sims <- sd_sens_S1yr_sims / sqrt(length(df_vec_sens_S1yr_sims$value))
+se_sens_S1yr_sims
+
+# 95% CI
+ci_lower_sens_S1yr_sims <- mean_sens_S1yr_sims - 1.96 * se_sens_S1yr_sims
+ci_lower_sens_S1yr_sims
+ci_upper_sens_S1yr_sims <- mean_sens_S1yr_sims + 1.96 * se_sens_S1yr_sims
+ci_upper_sens_S1yr_sims
+
 # Plot the density of elasticity of survival
 # Flatten into a numeric vector
 vec_elas_S1yr_sims <- unlist(elas_S1yr_sims)
@@ -325,6 +339,20 @@ ggplot(df_vec_elas_S1yr_sims, aes(x = value)) +
 # mean
 mean_elas_S1yr_sims <- mean(df_vec_elas_S1yr_sims$value)
 mean_elas_S1yr_sims
+
+# standard deviation
+sd_elas_S1yr_sims <- sd(df_vec_elas_S1yr_sims$value)
+sd_elas_S1yr_sims
+
+# SE (standard error) = sd / sqrt(n)
+se_elas_S1yr_sims <- sd_elas_S1yr_sims / sqrt(length(df_vec_elas_S1yr_sims$value))
+se_elas_S1yr_sims
+
+# 95% CI
+ci_lower_elas_S1yr_sims <- mean_elas_S1yr_sims - 1.96 * se_elas_S1yr_sims
+ci_lower_elas_S1yr_sims
+ci_upper_elas_S1yr_sims <- mean_elas_S1yr_sims + 1.96 * se_elas_S1yr_sims
+ci_upper_elas_S1yr_sims
 
 ## -----------------------------------------
 ## 2.1 Vital rate sensitivities for emigration
@@ -387,6 +415,20 @@ ggplot(df_vec_sens_E1yr_sims, aes(x = value)) +
 mean_sens_E1yr_sims <- mean(df_vec_sens_E1yr_sims$value)
 mean_sens_E1yr_sims
 
+# standard deviation
+sd_sens_E1yr_sims <- sd(df_vec_sens_E1yr_sims$value)
+sd_sens_E1yr_sims
+
+# SE (standard error) = sd / sqrt(n)
+se_sens_E1yr_sims <- sd_sens_E1yr_sims / sqrt(length(df_vec_sens_E1yr_sims$value))
+se_sens_E1yr_sims
+
+# 95% CI
+ci_lower_sens_E1yr_sims <- mean_sens_E1yr_sims - 1.96 * se_sens_E1yr_sims
+ci_lower_sens_E1yr_sims
+ci_upper_sens_E1yr_sims <- mean_sens_E1yr_sims + 1.96 * se_sens_E1yr_sims
+ci_upper_sens_E1yr_sims
+
 # Plot the density of elasticity of emigration
 # Flatten into a numeric vector
 vec_elas_E1yr_sims <- unlist(elas_E1yr_sims)
@@ -408,6 +450,20 @@ ggplot(df_vec_elas_E1yr_sims, aes(x = value)) +
 # mean
 mean_elas_E1yr_sims <- mean(df_vec_elas_E1yr_sims$value)
 mean_elas_E1yr_sims
+
+# standard deviation
+sd_elas_E1yr_sims <- sd(df_vec_elas_E1yr_sims$value)
+sd_elas_E1yr_sims
+
+# SE (standard error) = sd / sqrt(n)
+se_elas_E1yr_sims <- sd_elas_E1yr_sims / sqrt(length(df_vec_elas_E1yr_sims$value))
+se_elas_E1yr_sims
+
+# 95% CI
+ci_lower_elas_E1yr_sims <- mean_elas_E1yr_sims - 1.96 * se_elas_E1yr_sims
+ci_lower_elas_E1yr_sims
+ci_upper_elas_E1yr_sims <- mean_elas_E1yr_sims + 1.96 * se_elas_E1yr_sims
+ci_upper_elas_E1yr_sims
 
 ## -----------------------------------------
 ## 3.1 Vital rate sensitivities for recruitment
@@ -475,6 +531,20 @@ ggplot(df_vec_sens_f1yr_sims, aes(x = value)) +
 mean_sens_f1yr_sims <- mean(df_vec_sens_f1yr_sims$value)
 mean_sens_f1yr_sims
 
+# standard deviation
+sd_sens_f1yr_sims <- sd(df_vec_sens_f1yr_sims$value)
+sd_sens_f1yr_sims
+
+# SE (standard error) = sd / sqrt(n)
+se_sens_f1yr_sims <- sd_sens_f1yr_sims / sqrt(length(df_vec_sens_f1yr_sims$value))
+se_sens_f1yr_sims
+
+# 95% CI
+ci_lower_sens_f1yr_sims <- mean_sens_f1yr_sims - 1.96 * se_sens_f1yr_sims
+ci_lower_sens_f1yr_sims
+ci_upper_sens_f1yr_sims <- mean_sens_f1yr_sims + 1.96 * se_sens_f1yr_sims
+ci_upper_sens_f1yr_sims
+
 # Plot the density of elasticity of recruitment
 # Flatten into a numeric vector
 vec_elas_f1yr_sims <- unlist(elas_f1yr_sims)
@@ -496,6 +566,20 @@ ggplot(df_vec_elas_f1yr_sims, aes(x = value)) +
 # mean
 mean_elas_f1yr_sims <- mean(df_vec_elas_f1yr_sims$value)
 mean_elas_f1yr_sims
+
+# standard deviation
+sd_elas_f1yr_sims <- sd(df_vec_elas_f1yr_sims$value)
+sd_elas_f1yr_sims
+
+# SE (standard error) = sd / sqrt(n)
+se_elas_f1yr_sims <- sd_elas_f1yr_sims / sqrt(length(df_vec_elas_f1yr_sims$value))
+se_elas_f1yr_sims
+
+# 95% CI
+ci_lower_elas_f1yr_sims <- mean_elas_f1yr_sims - 1.96 * se_elas_f1yr_sims
+ci_lower_elas_f1yr_sims
+ci_upper_elas_f1yr_sims <- mean_elas_f1yr_sims + 1.96 * se_elas_f1yr_sims
+ci_upper_elas_f1yr_sims
 
 ## compare the 3 sensitivity models
 # makes data frame for 3 sensitivity models
