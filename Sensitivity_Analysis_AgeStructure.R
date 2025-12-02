@@ -1027,14 +1027,18 @@ ggplot(df_all_per_elas_models, aes(x = value, colour = model, fill = model)) +
 ## Make the table of vital rate sensitivity and elasticity for baseline models
 sens_base_set <- data.frame(
   Sensitivity = c("Survival", "Emigration", "Recruitment"),
-  Value = c(mean_sens_S1yr_sims, mean_sens_E1yr_sims, mean_sens_f1yr_sims)
+  Mean_value = c(mean_sens_S1yr_sims, mean_sens_E1yr_sims, mean_sens_f1yr_sims),
+  ci_lower = c(ci_lower_sens_S1yr_sims, ci_lower_sens_E1yr_sims,     ci_lower_sens_f1yr_sims),
+  ci_upper = c(ci_upper_sens_S1yr_sims, ci_upper_sens_E1yr_sims, ci_upper_sens_f1yr_sims)
 )
 
 sens_base_set
 
 elas_base_set <- data.frame(
   Elasticity = c("Survival", "Emigration", "Recruitment"),
-  Value = c(mean_elas_S1yr_sims, mean_elas_E1yr_sims, mean_elas_f1yr_sims)
+  Mean_value = c(mean_elas_S1yr_sims, mean_elas_E1yr_sims, mean_elas_f1yr_sims),
+  ci_lower = c(ci_lower_elas_S1yr_sims, ci_lower_elas_E1yr_sims,     ci_lower_elas_f1yr_sims),
+  ci_upper = c(ci_upper_elas_S1yr_sims, ci_upper_elas_E1yr_sims, ci_upper_elas_f1yr_sims)
 )
 
 elas_base_set
@@ -1042,14 +1046,18 @@ elas_base_set
 ## Make the table of vital rate sensitivity and elasticity for perturbation models
 sens_per_set <- data.frame(
   Sensitivity = c("Juvenile Survival", "Adult Survival", "Adult Recruitment"),
-  Value = c(mean_sens_perJS_sims, mean_sens_perAS_sims, mean_sens_perf_sims)
+  Mean_value = c(mean_sens_perJS_sims, mean_sens_perAS_sims, mean_sens_perf_sims),
+  ci_lower = c(ci_lower_sens_perJS_sims, ci_lower_sens_perAS_sims,     ci_lower_sens_perf_sims),
+  ci_upper = c(ci_upper_sens_perJS_sims, ci_upper_sens_perAS_sims, ci_upper_sens_perf_sims)
 )
 
 sens_per_set
 
 elas_per_set <- data.frame(
   Elasticity = c("Juvenile Survival", "Adult Survival", "Adult Recruitment"),
-  Value = c(mean_elas_perJS_sims, mean_elas_perAS_sims, mean_elas_perf_sims)
+  Mean_value = c(mean_elas_perJS_sims, mean_elas_perAS_sims, mean_elas_perf_sims),
+  ci_lower = c(ci_lower_elas_perJS_sims, ci_lower_elas_perAS_sims,     ci_lower_elas_perf_sims),
+  ci_upper = c(ci_upper_elas_perJS_sims, ci_upper_elas_perAS_sims, ci_upper_elas_perf_sims)
 )
 
 elas_per_set
