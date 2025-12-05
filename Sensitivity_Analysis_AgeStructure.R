@@ -102,12 +102,9 @@ mean_lambda <- mean(lambda_values)
 # standard deviation
 sd_lambda <- sd(lambda_values)
 
-# SE (standard error) = sd / sqrt(n)
-se_lambda <- sd_lambda / sqrt(length(lambda_values))
-
 # 95% CI
-ci_lower <- mean_lambda - 1.96 * se_lambda
-ci_upper <- mean_lambda + 1.96 * se_lambda
+ci_lower <- quantile(lambda_values, prob = 0.025) 
+ci_upper <- quantile(lambda_values, prob = 0.975) 
 
 # creating density plot
 plot(density(lambda_values),
