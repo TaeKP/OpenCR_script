@@ -1,6 +1,10 @@
 
 library(popbio)
 
+## Set seed
+mySeed <- 90
+set.seed(mySeed)
+
 # SET VITAL RATE & POPULATION PARAMETERS FROM SCR #
 #-------------------------------------------------#
 
