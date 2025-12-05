@@ -38,12 +38,12 @@ source("build_popMat.R")
 stochastic <- TRUE
 nsim <- 1000
 
-## Run function (for nsim stochastic samples)
+## Build population projection matrix for mean values
 popMat <- build_popMat(growth_rate = lambda, growth_rate_sd = SD_growth_rate,
                        survival_rate = S, survival_rate_sd = SD_survival_rate,
                        recruitment_rate = f, recruitment_rate_sd = SD_recruitment,
                        init_adultProp = init_adultProp_mean, init_adultProp_SD = init_adultProp_SD,
-                       stochastic = stochastic)
+                       stochastic = FALSE)
 
 A <- popMat$A
 
