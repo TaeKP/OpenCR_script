@@ -85,12 +85,12 @@ elas.ME <- popbio::elasticity(A)
 #---------------------#
 # Creating the for loop to calculate lambda with 1000 simulations
 # Creating vector to store lambda
-lambda_values <- numeric(dim(nsim_array)[3])
+lambda_values <- numeric(nsim)
 
 # Using for loop to calculate lambda from each matrix
 for (k in 1:dim(nsim_array)[3]) {
   mat <- nsim_array[,,k]
-  lambda_values[k] <- lambda(mat)   
+  lambda_values[k] <- popbio::lambda(mat)   
 }
 
 # Checking lambda result
