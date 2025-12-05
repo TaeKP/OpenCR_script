@@ -293,7 +293,7 @@ ggplot(df_vec_sens_S1yr_sims, aes(x = value)) +
   geom_hline(yintercept = 0, colour = "black") +
   scale_y_continuous(expand = c(0,0)) +
   geom_vline(xintercept = mean(df_vec_sens_S1yr_sims$value), colour = "red", linetype = "dashed") +
-  labs(title = "Density plot of sensitivity of survival")
+  labs(title = "Sensitivity of pop. growth rate (survival)")
 
 # mean
 mean_sens_S1yr_sims <- mean(df_vec_sens_S1yr_sims$value)
@@ -325,7 +325,7 @@ ggplot(df_vec_elas_S1yr_sims, aes(x = value)) +
   geom_hline(yintercept = 0, colour = "black") +
   scale_y_continuous(expand = c(0,0)) +
   geom_vline(xintercept = mean(df_vec_elas_S1yr_sims$value), colour = "red", linetype = "dashed") +
-  labs(title = "Density plot of elasticity of survival")
+  labs(title = "Elasticity of pop. growth rate (survival)")
 
 # mean
 mean_elas_S1yr_sims <- mean(df_vec_elas_S1yr_sims$value)
@@ -390,7 +390,7 @@ ggplot(df_vec_sens_E1yr_sims, aes(x = value)) +
   geom_hline(yintercept = 0, colour = "black") +
   scale_y_continuous(expand = c(0,0)) +
   geom_vline(xintercept = mean(df_vec_sens_E1yr_sims$value), colour = "red", linetype = "dashed") +
-  labs(title = "Density plot of sensitivity of emigration")
+  labs(title = "Sensitivity of pop. growth rate (emigration)")
 
 # mean
 mean_sens_E1yr_sims <- mean(df_vec_sens_E1yr_sims$value)
@@ -422,7 +422,7 @@ ggplot(df_vec_elas_E1yr_sims, aes(x = value)) +
   geom_hline(yintercept = 0, colour = "black") +
   scale_y_continuous(expand = c(0,0)) +
   geom_vline(xintercept = mean(df_vec_elas_E1yr_sims$value), colour = "red", linetype = "dashed") +
-  labs(title = "Density plot of elasticity of emigration")
+  labs(title = "Elasticity of pop. growth rate (emigration)")
 
 # mean
 mean_elas_E1yr_sims <- mean(df_vec_elas_E1yr_sims$value)
@@ -492,7 +492,7 @@ ggplot(df_vec_sens_f1yr_sims, aes(x = value)) +
   geom_hline(yintercept = 0, colour = "black") +
   scale_y_continuous(expand = c(0,0)) +
   geom_vline(xintercept = mean(df_vec_sens_f1yr_sims$value), colour = "red", linetype = "dashed") +
-  labs(title = "Density plot of sensitivity of recruitment")
+  labs(title = "Sensitivity of pop. growth rate (recruitment)")
 
 # mean
 mean_sens_f1yr_sims <- mean(df_vec_sens_f1yr_sims$value)
@@ -524,7 +524,7 @@ ggplot(df_vec_elas_f1yr_sims, aes(x = value)) +
   geom_hline(yintercept = 0, colour = "black") +
   scale_y_continuous(expand = c(0,0)) +
   geom_vline(xintercept = mean(df_vec_elas_f1yr_sims$value), colour = "red", linetype = "dashed") +
-  labs(title = "Density plot of elasticity of recruitment")
+  labs(title = "Elasticity of pop. growth rate (recruitment)")
 
 # mean
 mean_elas_f1yr_sims <- mean(df_vec_elas_f1yr_sims$value)
