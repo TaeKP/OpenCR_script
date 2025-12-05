@@ -99,6 +99,9 @@ print(lambda_values)
 # mean
 mean_lambda <- mean(lambda_values)
 
+# median
+median_lambda <- median(lambda_values)
+
 # standard deviation
 sd_lambda <- sd(lambda_values)
 
@@ -116,14 +119,17 @@ plot(density(lambda_values),
 # adding mean
 abline(v = mean_lambda, col = "red", lwd = 2, lty = 2)
 
+# adding median
+abline(v = median_lambda, col = "red", lwd = 2, lty = 3)
+
 # adding 95% CI
 abline(v = ci_lower, col = "darkgreen", lwd = 2, lty = 3)
 abline(v = ci_upper, col = "darkgreen", lwd = 2, lty = 3)
 
 legend("topright",
-       legend = c("Density", "Mean", "95% CI"),
-       col = c("blue", "red", "darkgreen"),
-       lty = c(1, 2, 3),
+       legend = c("Density", "Mean", "Median", "95% CI"),
+       col = c("blue", "red", "red", "darkgreen"),
+       lty = c(1, 2, 3, 3),
        lwd = 2)
 
 #---------------------#
