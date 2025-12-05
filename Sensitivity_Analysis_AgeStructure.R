@@ -51,36 +51,12 @@ A <- popMat$A
 str(popMat)
 str(A)
 
-## Run function with 1000 simulation stochastic samples
-result_popMat <- replicate(nsim, build_popMat(growth_rate = lambda, growth_rate_sd = SD_growth_rate,
-                                              survival_rate = S, survival_rate_sd = SD_survival_rate,
-                                              recruitment_rate = f, recruitment_rate_sd = SD_recruitment,
-                                              init_adultProp = init_adultProp_mean, init_adultProp_SD = init_adultProp_SD,
-                                              stochastic = stochastic))
-
-
-# Checking structure
-str(result_popMat)
-
-# indexing of each matrix; first 10 slices
-result_popMat[c(1, 7, 13, 19, 25, 31, 37, 43, 49, 55)]
-
-# construct the for loop to store the nsim values 
-
-# Selecting matrix every 6 values
-selected_indices <- seq(1, length(result_popMat), by = 6)
-
-# Checking the size of matrix 
-nrow_mat <- nrow(result_popMat[[selected_indices[1]]])
-ncol_mat <- ncol(result_popMat[[selected_indices[1]]])
-
-# Creating empty array
-nsim_array <- array(NA, dim = c(nrow_mat, ncol_mat, length(selected_indices)))
-
-# Filling every matrix in each slice
-for (k in seq_along(selected_indices)) {
-  nsim_array[,,k] <- result_popMat[[selected_indices[k]]]
-}
+## Assemble nsim replicate matrices
+nsim_array <- replicate(nsim, build_popMat(growth_rate = lambda, growth_rate_sd = SD_growth_rate,
+                                           survival_rate = S, survival_rate_sd = SD_survival_rate,
+                                           recruitment_rate = f, recruitment_rate_sd = SD_recruitment,
+                                           init_adultProp = init_adultProp_mean, init_adultProp_SD = init_adultProp_SD,
+                                           stochastic = stochastic)$A)
 
 # Checking the result
 print(dim(nsim_array))    # array size 2*2*10
