@@ -255,17 +255,11 @@ sens_S1yr_sims <- lapply(sens_results, function(x) sum(derivA_S1yr %*% x))
 sens_S1yr_sims
 
 ## 1.2 Estimating the elasticity for the Survival
-# Indexing the list object to extract the "S1yr" from the result_popMat
-# indexing of each matrix; first 10 slices
-result_popMat[c(2, 8, 14, 20, 26, 32, 38, 44, 50, 56)]
-
-# Define the position of each S1yr to extract the values from result_popMat
-selected_S1 <-seq(2, length(result_popMat), by = 6)
-selected_S1
-
 # Building the object for the S1yr values
-result_S1 <- result_popMat[selected_S1]
-result_S1
+result_S1 <- c()
+for(i in 1:nsim){
+  result_S1 <- c(result_S1, nsim_VRs[[i]]$S1yr)
+}
 
 # Checking the structure of result_S1 for list object include 1000 values
 str(result_S1)
@@ -275,7 +269,7 @@ elas_S1yr_sims <- vector("list", length = 1000)
 
 # Loop through positions
 for (i in seq_along(sens_S1yr_sims)) {
-  elas_S1yr_sims[[i]] <- sens_S1yr_sims[[i]] * (result_S1[[i]] / lambda_values[i])
+  elas_S1yr_sims[[i]] <- sens_S1yr_sims[[i]] * (result_S1[i] / lambda_values[i])
 }
 
 # This is elasticity of survival from 1000 samples
@@ -368,17 +362,11 @@ sens_E1yr_sims <- lapply(sens_results, function(x) sum(derivA_E1yr %*% x))
 sens_E1yr_sims
 
 ## 2.2 Estimating the elasticity for the Emigration
-# Indexing the list object to extract the "E1yr" from the result_popMat
-# indexing of each matrix; first 10 slices
-result_popMat[c(5, 11, 17, 23, 29, 35, 41, 47, 53, 59)]
-
-# Define the position of each E1yr to extract the values from result_popMat
-selected_E1 <-seq(5, length(result_popMat), by = 6)
-selected_E1
-
 # Building the object for the E1yr values
-result_E1 <- result_popMat[selected_E1]
-result_E1
+result_E1 <- c()
+for(i in 1:nsim){
+  result_E1 <- c(result_E1, nsim_VRs[[i]]$E1yr)
+}
 
 # Checking the structure of result_E1 for list object include 1000 values
 str(result_E1)
@@ -484,17 +472,11 @@ length(sens_f1yr_sims)  # must be 1000
 sens_f1yr_sims
 
 ## 3.2 Estimating the elasticity for the Recruitment
-# Indexing the list object to extract the "f1yr_ad" from the result_popMat
-# indexing of each matrix; first 10 slices
-result_popMat[c(4, 10, 16, 22, 28, 34, 40, 46, 52, 58)]
-
-# Define the position of each f1yr_ad to extract the values from result_popMat
-selected_f1 <-seq(4, length(result_popMat), by = 6)
-selected_f1
-
 # Building the object for the f1yr_ad values
-result_f1 <- result_popMat[selected_f1]
-result_f1
+result_f1 <- c()
+for(i in 1:nsim){
+  result_f1 <- c(result_S1, nsim_VRs[[i]]$f1yr)
+}
 
 # Checking the structure of result_f1 for list object include 1000 values
 str(result_f1)
