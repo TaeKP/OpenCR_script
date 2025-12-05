@@ -153,9 +153,9 @@ legend("topright",
 #---------------------#
 # Creating the for loop to run matrix element sensitivities with 1000 simulations
 # Creating list to store sensitivity matrices
-sens_results <- vector("list", dim(nsim_array)[3])
+sens_results <- vector("list", nsim)
 
-for (k in 1:dim(nsim_array)[3]) {
+for (k in 1:nsim) {
   mat <- nsim_array[,,k]
   sens_results[[k]] <- sensitivity(mat)
 }
@@ -174,9 +174,9 @@ print(s11)
 #---------------------#
 # Creating the for loop to run matrix element elasticities with 1000 simulations
 # Creating list to store elasticity
-elas_results <- vector("list", dim(nsim_array)[3])
+elas_results <- vector("list", nsim)
 
-for (k in 1:dim(nsim_array)[3]) {
+for (k in 1:nsim) {
   mat <- nsim_array[,,k]
   elas_results[[k]] <- elasticity(mat)
 }
