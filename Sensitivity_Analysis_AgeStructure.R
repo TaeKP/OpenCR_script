@@ -303,14 +303,10 @@ mean_sens_S1yr_sims
 sd_sens_S1yr_sims <- sd(df_vec_sens_S1yr_sims$value)
 sd_sens_S1yr_sims
 
-# SE (standard error) = sd / sqrt(n)
-se_sens_S1yr_sims <- sd_sens_S1yr_sims / sqrt(length(df_vec_sens_S1yr_sims$value))
-se_sens_S1yr_sims
-
 # 95% CI
-ci_lower_sens_S1yr_sims <- mean_sens_S1yr_sims - 1.96 * se_sens_S1yr_sims
+ci_lower_sens_S1yr_sims <- quantile(df_vec_sens_S1yr_sims$value, probs = 0.025)
 ci_lower_sens_S1yr_sims
-ci_upper_sens_S1yr_sims <- mean_sens_S1yr_sims + 1.96 * se_sens_S1yr_sims
+ci_upper_sens_S1yr_sims <- quantile(df_vec_sens_S1yr_sims$value, probs = 0.975)
 ci_upper_sens_S1yr_sims
 
 # Plot the density of elasticity of survival
@@ -339,14 +335,10 @@ mean_elas_S1yr_sims
 sd_elas_S1yr_sims <- sd(df_vec_elas_S1yr_sims$value)
 sd_elas_S1yr_sims
 
-# SE (standard error) = sd / sqrt(n)
-se_elas_S1yr_sims <- sd_elas_S1yr_sims / sqrt(length(df_vec_elas_S1yr_sims$value))
-se_elas_S1yr_sims
-
 # 95% CI
-ci_lower_elas_S1yr_sims <- mean_elas_S1yr_sims - 1.96 * se_elas_S1yr_sims
+ci_lower_elas_S1yr_sims <- quantile(df_vec_elas_S1yr_sims$value, probs = 0.025)
 ci_lower_elas_S1yr_sims
-ci_upper_elas_S1yr_sims <- mean_elas_S1yr_sims + 1.96 * se_elas_S1yr_sims
+ci_upper_elas_S1yr_sims <- quantile(df_vec_elas_S1yr_sims$value, probs = 0.975)
 ci_upper_elas_S1yr_sims
 
 ## -----------------------------------------
@@ -408,14 +400,10 @@ mean_sens_E1yr_sims
 sd_sens_E1yr_sims <- sd(df_vec_sens_E1yr_sims$value)
 sd_sens_E1yr_sims
 
-# SE (standard error) = sd / sqrt(n)
-se_sens_E1yr_sims <- sd_sens_E1yr_sims / sqrt(length(df_vec_sens_E1yr_sims$value))
-se_sens_E1yr_sims
-
 # 95% CI
-ci_lower_sens_E1yr_sims <- mean_sens_E1yr_sims - 1.96 * se_sens_E1yr_sims
+ci_lower_sens_E1yr_sims <- quantile(df_vec_sens_E1yr_sims$value, probs = 0.025)
 ci_lower_sens_E1yr_sims
-ci_upper_sens_E1yr_sims <- mean_sens_E1yr_sims + 1.96 * se_sens_E1yr_sims
+ci_upper_sens_E1yr_sims <- quantile(df_vec_sens_E1yr_sims$value, probs = 0.975)
 ci_upper_sens_E1yr_sims
 
 # Plot the density of elasticity of emigration
@@ -444,14 +432,10 @@ mean_elas_E1yr_sims
 sd_elas_E1yr_sims <- sd(df_vec_elas_E1yr_sims$value)
 sd_elas_E1yr_sims
 
-# SE (standard error) = sd / sqrt(n)
-se_elas_E1yr_sims <- sd_elas_E1yr_sims / sqrt(length(df_vec_elas_E1yr_sims$value))
-se_elas_E1yr_sims
-
 # 95% CI
-ci_lower_elas_E1yr_sims <- mean_elas_E1yr_sims - 1.96 * se_elas_E1yr_sims
+ci_lower_elas_E1yr_sims <- quantile(df_vec_elas_E1yr_sims$value, probs = 0.025)
 ci_lower_elas_E1yr_sims
-ci_upper_elas_E1yr_sims <- mean_elas_E1yr_sims + 1.96 * se_elas_E1yr_sims
+ci_upper_elas_E1yr_sims <- quantile(df_vec_elas_E1yr_sims$value, probs = 0.975)
 ci_upper_elas_E1yr_sims
 
 ## -----------------------------------------
@@ -518,14 +502,10 @@ mean_sens_f1yr_sims
 sd_sens_f1yr_sims <- sd(df_vec_sens_f1yr_sims$value)
 sd_sens_f1yr_sims
 
-# SE (standard error) = sd / sqrt(n)
-se_sens_f1yr_sims <- sd_sens_f1yr_sims / sqrt(length(df_vec_sens_f1yr_sims$value))
-se_sens_f1yr_sims
-
 # 95% CI
-ci_lower_sens_f1yr_sims <- mean_sens_f1yr_sims - 1.96 * se_sens_f1yr_sims
+ci_lower_sens_f1yr_sims <- quantile(df_vec_sens_f1yr_sims$value, probs = 0.025)
 ci_lower_sens_f1yr_sims
-ci_upper_sens_f1yr_sims <- mean_sens_f1yr_sims + 1.96 * se_sens_f1yr_sims
+ci_upper_sens_f1yr_sims <- quantile(df_vec_sens_f1yr_sims$value, probs = 0.975)
 ci_upper_sens_f1yr_sims
 
 # Plot the density of elasticity of recruitment
@@ -554,14 +534,10 @@ mean_elas_f1yr_sims
 sd_elas_f1yr_sims <- sd(df_vec_elas_f1yr_sims$value)
 sd_elas_f1yr_sims
 
-# SE (standard error) = sd / sqrt(n)
-se_elas_f1yr_sims <- sd_elas_f1yr_sims / sqrt(length(df_vec_elas_f1yr_sims$value))
-se_elas_f1yr_sims
-
 # 95% CI
-ci_lower_elas_f1yr_sims <- mean_elas_f1yr_sims - 1.96 * se_elas_f1yr_sims
+ci_lower_elas_f1yr_sims <- quantile(df_vec_elas_f1yr_sims$value, probs = 0.025)
 ci_lower_elas_f1yr_sims
-ci_upper_elas_f1yr_sims <- mean_elas_f1yr_sims + 1.96 * se_elas_f1yr_sims
+ci_upper_elas_f1yr_sims <- quantile(df_vec_elas_f1yr_sims$value, probs = 0.975)
 ci_upper_elas_f1yr_sims
 
 ## compare the 3 sensitivity models
