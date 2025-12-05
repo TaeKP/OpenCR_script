@@ -52,11 +52,29 @@ str(popMat)
 str(A)
 
 ## Assemble nsim replicate matrices
-nsim_array <- replicate(nsim, build_popMat(growth_rate = lambda, growth_rate_sd = SD_growth_rate,
+result_popMat <- replicate(nsim, build_popMat(growth_rate = lambda, growth_rate_sd = SD_growth_rate,
                                            survival_rate = S, survival_rate_sd = SD_survival_rate,
                                            recruitment_rate = f, recruitment_rate_sd = SD_recruitment,
                                            init_adultProp = init_adultProp_mean, init_adultProp_SD = init_adultProp_SD,
-                                           stochastic = stochastic)$A)
+                                           stochastic = stochastic))
+
+nsim_VRs <- list()
+nsim_array <- array(dim = c(nrow(A), ncol(A), nsim))
+
+
+for(i in 1:nsim){
+  
+  result_popMat <- build_popMat(growth_rate = lambda, growth_rate_sd = SD_growth_rate,
+                                survival_rate = S, survival_rate_sd = SD_survival_rate,
+                                recruitment_rate = f, recruitment_rate_sd = SD_recruitment,
+                                init_adultProp = init_adultProp_mean, init_adultProp_SD = init_adultProp_SD,
+                                stochastic = stochastic)
+  
+  nsim_array[,,i] <- result_popMat$A
+  
+  result_popMat$A <- NULL
+  nsim_VRs <- append(nsim_VRs, list(result_popMat))
+}
 
 # Checking the result
 print(dim(nsim_array))    # array size 2*2*10
