@@ -535,3 +535,12 @@ extinct_s3 <- final_total_s3 == 0
 # Probability of extinction
 extinction_probability_age_str_s3 <- mean(extinct_s3)
 extinction_probability_age_str_s3
+
+#-------------------------------------------------------------------------------
+# Create an extinction risk table
+extinction_set <- data.frame(
+  Scenario = c("Baseline", "5% survival decreased", "5% recruitment decreased", "5% survival and recruitment decreased"),
+  Extinction_probability = c(extinction_probability_age_str, extinction_probability_age_str_s1, extinction_probability_age_str_s2, extinction_probability_age_str_s3)
+)
+
+extinction_set
