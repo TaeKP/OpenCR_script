@@ -300,3 +300,83 @@ ggplot() +
   ) +
   labs(title = "Population projections",
        x = "Year", y = "Population size")
+
+#-------------------------------------------------------------------------------
+## Management Scenario related to sensitivity analysis modified 15 November 2025
+## Scenario 1	
+## 5% Decreasing the survival rate 
+## perturbation factor "S" at 0.95
+
+# Running the simulation multiple times
+(results_age_str_s1 <- replicate(simulations, pva_simulation_age_str(initN, 
+                                                                     growth_rate, growth_rate_sd,
+                                                                     survival_rate, survival_rate_sd,
+                                                                     recruitment_rate, recruitment_rate_sd,
+                                                                     init_adultProp, init_adultProp_SD,
+                                                                     carrying_capacity, 
+                                                                     pertFac.S = 0.95, pertFac.f = 1, pertFac.E = 1,
+                                                                     n_years)) )
+
+# Write results as data frames
+# compare with baseline scenario
+
+sim_s1 <- reshape2::melt(apply(results_age_str_s1, c(2, 3), sum)) %>%
+  dplyr::rename(Year = Var1, SimNo = Var2, PopSize = value) %>%
+  dplyr::mutate(Model = "5% survival decreased")
+
+## Combine results and summarise
+simSummary_s1 <- rbind(sim_s1) %>%
+  dplyr::mutate(PopSize = ifelse(is.na(PopSize), 0, PopSize)) %>%
+  dplyr::group_by(Model, Year) %>%
+  dplyr::summarise(mean_N = mean(PopSize),
+                   median_N = median(PopSize),
+                   sd_N = sd(PopSize),
+                   lCI_N = quantile(PopSize, probs = 0.025),
+                   uCI_N = quantile(PopSize, probs = 0.975),
+                   .groups = "keep") 
+
+# Black line color and Blue median line
+ggplot() +
+  # spaghetti plot (all simulations in black)
+  geom_line(data = sim_s1,
+            aes(x = Year, y = PopSize, group = SimNo),
+            color = "black", alpha = 0.1) +
+  
+  # median line (blue)
+  geom_line(data = simSummary_s1,
+            aes(x = Year, y = median_N),
+            color = "blue", linewidth = 1) +
+  scale_x_continuous(breaks = seq(0, 10, by = 2), expand = c(0,0)) +   # custom x-axis ticks
+  
+  # horizontal line at y = 140
+  geom_hline(yintercept = 140, linetype = "dashed", color = "red", linewidth = 1) +
+  
+  # optional ribbon (keep or remove)
+  #geom_ribbon(data = simSummary_s1,
+  #            aes(x = Year, ymin = lCI_N, ymax = uCI_N),
+  #            fill = "blue", alpha = 0.2) +
+  
+  theme_minimal() +
+  theme(
+    panel.background = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(color = "black")
+  ) +
+  labs(title = "Population projections",
+       x = "Year", y = "Population size")
+
+# Calculate the probability of extinction by the end of the simulation period
+# Extract population sizes at the final year across all samples
+final_pop_s1 <- results_age_str_s1[, n_years, ]   # age classes × samples
+
+# Sum across age classes to get total population per sample
+final_total_s1 <- colSums(final_pop_s1, na.rm = TRUE)
+
+# Extinction indicator: 1 if total population == 0
+extinct_s1 <- final_total_s1 == 0
+
+# Probability of extinction
+extinction_probability_age_str_s1 <- mean(extinct_s1)
+extinction_probability_age_str_s1
+
