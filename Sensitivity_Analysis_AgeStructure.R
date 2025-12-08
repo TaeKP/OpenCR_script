@@ -479,7 +479,7 @@ sens_f1yr_sims
 # Building the object for the f1yr_ad values
 result_f1 <- c()
 for(i in 1:nsim){
-  result_f1 <- c(result_S1, nsim_VRs[[i]]$f1yr)
+  result_f1 <- c(result_f1, nsim_VRs[[i]]$f1yr)
 }
 
 # Checking the structure of result_f1 for list object include 1000 values
