@@ -292,16 +292,21 @@ ggplot(df_vec_sens_S1yr_sims, aes(x = value)) +
   ) +
   geom_hline(yintercept = 0, colour = "black") +
   scale_y_continuous(expand = c(0,0)) +
-  geom_vline(xintercept = mean(df_vec_sens_S1yr_sims$value), colour = "red", linetype = "dashed") +
+  geom_vline(xintercept = median(df_vec_sens_S1yr_sims$value), colour = "red", linetype = "dashed") +
+  #geom_vline(xintercept = mean(df_vec_sens_S1yr_sims$value), colour = "red", linetype = "dashed") +
   labs(title = "Sensitivity of pop. growth rate (survival)")
 
 # mean
-mean_sens_S1yr_sims <- mean(df_vec_sens_S1yr_sims$value)
-mean_sens_S1yr_sims
+#mean_sens_S1yr_sims <- mean(df_vec_sens_S1yr_sims$value)
+#mean_sens_S1yr_sims
+
+# median
+median_sens_S1yr_sims <- median(df_vec_sens_S1yr_sims$value)
+median_sens_S1yr_sims
 
 # standard deviation
-sd_sens_S1yr_sims <- sd(df_vec_sens_S1yr_sims$value)
-sd_sens_S1yr_sims
+#sd_sens_S1yr_sims <- sd(df_vec_sens_S1yr_sims$value)
+#sd_sens_S1yr_sims
 
 # 95% CI
 ci_lower_sens_S1yr_sims <- quantile(df_vec_sens_S1yr_sims$value, probs = 0.025)
@@ -324,16 +329,21 @@ ggplot(df_vec_elas_S1yr_sims, aes(x = value)) +
   ) +
   geom_hline(yintercept = 0, colour = "black") +
   scale_y_continuous(expand = c(0,0)) +
-  geom_vline(xintercept = mean(df_vec_elas_S1yr_sims$value), colour = "red", linetype = "dashed") +
+  geom_vline(xintercept = median(df_vec_elas_S1yr_sims$value), colour = "red", linetype = "dashed") +
+  #geom_vline(xintercept = mean(df_vec_elas_S1yr_sims$value), colour = "red", linetype = "dashed") +
   labs(title = "Elasticity of pop. growth rate (survival)")
 
 # mean
-mean_elas_S1yr_sims <- mean(df_vec_elas_S1yr_sims$value)
-mean_elas_S1yr_sims
+#mean_elas_S1yr_sims <- mean(df_vec_elas_S1yr_sims$value)
+#mean_elas_S1yr_sims
+
+# median
+median_elas_S1yr_sims <- median(df_vec_elas_S1yr_sims$value)
+median_elas_S1yr_sims
 
 # standard deviation
-sd_elas_S1yr_sims <- sd(df_vec_elas_S1yr_sims$value)
-sd_elas_S1yr_sims
+#sd_elas_S1yr_sims <- sd(df_vec_elas_S1yr_sims$value)
+#sd_elas_S1yr_sims
 
 # 95% CI
 ci_lower_elas_S1yr_sims <- quantile(df_vec_elas_S1yr_sims$value, probs = 0.025)
@@ -389,16 +399,21 @@ ggplot(df_vec_sens_E1yr_sims, aes(x = value)) +
   ) +
   geom_hline(yintercept = 0, colour = "black") +
   scale_y_continuous(expand = c(0,0)) +
-  geom_vline(xintercept = mean(df_vec_sens_E1yr_sims$value), colour = "red", linetype = "dashed") +
+  geom_vline(xintercept = median(df_vec_sens_E1yr_sims$value), colour = "red", linetype = "dashed") +
+  #geom_vline(xintercept = mean(df_vec_sens_E1yr_sims$value), colour = "red", linetype = "dashed") +
   labs(title = "Sensitivity of pop. growth rate (emigration)")
 
 # mean
-mean_sens_E1yr_sims <- mean(df_vec_sens_E1yr_sims$value)
-mean_sens_E1yr_sims
+#mean_sens_E1yr_sims <- mean(df_vec_sens_E1yr_sims$value)
+#mean_sens_E1yr_sims
+
+# median
+median_sens_E1yr_sims <- median(df_vec_sens_E1yr_sims$value)
+median_sens_E1yr_sims
 
 # standard deviation
-sd_sens_E1yr_sims <- sd(df_vec_sens_E1yr_sims$value)
-sd_sens_E1yr_sims
+#sd_sens_E1yr_sims <- sd(df_vec_sens_E1yr_sims$value)
+#sd_sens_E1yr_sims
 
 # 95% CI
 ci_lower_sens_E1yr_sims <- quantile(df_vec_sens_E1yr_sims$value, probs = 0.025)
@@ -421,16 +436,21 @@ ggplot(df_vec_elas_E1yr_sims, aes(x = value)) +
   ) +
   geom_hline(yintercept = 0, colour = "black") +
   scale_y_continuous(expand = c(0,0)) +
-  geom_vline(xintercept = mean(df_vec_elas_E1yr_sims$value), colour = "red", linetype = "dashed") +
+  geom_vline(xintercept = median(df_vec_elas_E1yr_sims$value), colour = "red", linetype = "dashed") +
+  #geom_vline(xintercept = mean(df_vec_elas_E1yr_sims$value), colour = "red", linetype = "dashed") +
   labs(title = "Elasticity of pop. growth rate (emigration)")
 
 # mean
-mean_elas_E1yr_sims <- mean(df_vec_elas_E1yr_sims$value)
-mean_elas_E1yr_sims
+#mean_elas_E1yr_sims <- mean(df_vec_elas_E1yr_sims$value)
+#mean_elas_E1yr_sims
+
+# median
+median_elas_E1yr_sims <- median(df_vec_elas_E1yr_sims$value)
+median_elas_E1yr_sims
 
 # standard deviation
-sd_elas_E1yr_sims <- sd(df_vec_elas_E1yr_sims$value)
-sd_elas_E1yr_sims
+#sd_elas_E1yr_sims <- sd(df_vec_elas_E1yr_sims$value)
+#sd_elas_E1yr_sims
 
 # 95% CI
 ci_lower_elas_E1yr_sims <- quantile(df_vec_elas_E1yr_sims$value, probs = 0.025)
@@ -459,7 +479,7 @@ sens_f1yr_sims
 # Building the object for the f1yr_ad values
 result_f1 <- c()
 for(i in 1:nsim){
-  result_f1 <- c(result_S1, nsim_VRs[[i]]$f1yr)
+  result_f1 <- c(result_f1, nsim_VRs[[i]]$f1yr)
 }
 
 # Checking the structure of result_f1 for list object include 1000 values
@@ -491,16 +511,21 @@ ggplot(df_vec_sens_f1yr_sims, aes(x = value)) +
   ) +
   geom_hline(yintercept = 0, colour = "black") +
   scale_y_continuous(expand = c(0,0)) +
-  geom_vline(xintercept = mean(df_vec_sens_f1yr_sims$value), colour = "red", linetype = "dashed") +
+  geom_vline(xintercept = median(df_vec_sens_f1yr_sims$value), colour = "red", linetype = "dashed") +
+  #geom_vline(xintercept = mean(df_vec_sens_f1yr_sims$value), colour = "red", linetype = "dashed") +
   labs(title = "Sensitivity of pop. growth rate (recruitment)")
 
 # mean
-mean_sens_f1yr_sims <- mean(df_vec_sens_f1yr_sims$value)
-mean_sens_f1yr_sims
+#mean_sens_f1yr_sims <- mean(df_vec_sens_f1yr_sims$value)
+#mean_sens_f1yr_sims
+
+# median
+median_sens_f1yr_sims <- median(df_vec_sens_f1yr_sims$value)
+median_sens_f1yr_sims
 
 # standard deviation
-sd_sens_f1yr_sims <- sd(df_vec_sens_f1yr_sims$value)
-sd_sens_f1yr_sims
+#sd_sens_f1yr_sims <- sd(df_vec_sens_f1yr_sims$value)
+#sd_sens_f1yr_sims
 
 # 95% CI
 ci_lower_sens_f1yr_sims <- quantile(df_vec_sens_f1yr_sims$value, probs = 0.025)
@@ -523,16 +548,21 @@ ggplot(df_vec_elas_f1yr_sims, aes(x = value)) +
   ) +
   geom_hline(yintercept = 0, colour = "black") +
   scale_y_continuous(expand = c(0,0)) +
-  geom_vline(xintercept = mean(df_vec_elas_f1yr_sims$value), colour = "red", linetype = "dashed") +
+  geom_vline(xintercept = median(df_vec_elas_f1yr_sims$value), colour = "red", linetype = "dashed") +
+  #geom_vline(xintercept = mean(df_vec_elas_f1yr_sims$value), colour = "red", linetype = "dashed") +
   labs(title = "Elasticity of pop. growth rate (recruitment)")
 
 # mean
-mean_elas_f1yr_sims <- mean(df_vec_elas_f1yr_sims$value)
-mean_elas_f1yr_sims
+#mean_elas_f1yr_sims <- mean(df_vec_elas_f1yr_sims$value)
+#mean_elas_f1yr_sims
+
+# median
+median_elas_f1yr_sims <- median(df_vec_elas_f1yr_sims$value)
+median_elas_f1yr_sims
 
 # standard deviation
-sd_elas_f1yr_sims <- sd(df_vec_elas_f1yr_sims$value)
-sd_elas_f1yr_sims
+#sd_elas_f1yr_sims <- sd(df_vec_elas_f1yr_sims$value)
+#sd_elas_f1yr_sims
 
 # 95% CI
 ci_lower_elas_f1yr_sims <- quantile(df_vec_elas_f1yr_sims$value, probs = 0.025)
@@ -544,16 +574,17 @@ ci_upper_elas_f1yr_sims
 # makes data frame for 3 sensitivity models
 df_all_sens_models <- data.frame(
   value = c(vec_sens_S1yr_sims, vec_sens_E1yr_sims, vec_sens_f1yr_sims),
-  model = rep(c("Model S", "Model E", "Model f"), each = 1000)
+  model = rep(c("Survival", "Emigration", "Recruitment"), each = 1000)
 )
 
 df_all_sens_models
 
 # calculate the mean value for each model
 library(dplyr)
-means_sens <- df_all_sens_models %>%
+
+median_sens <- df_all_sens_models %>%
   group_by(model) %>%
-  summarise(mean_val = mean(value), .groups = "drop")
+  summarise(median_val = median(value), .groups = "drop")
 
 # Plot densities together with each mean line
 ggplot(df_all_sens_models, aes(x = value, colour = model, fill = model)) +
@@ -566,24 +597,24 @@ ggplot(df_all_sens_models, aes(x = value, colour = model, fill = model)) +
     axis.line = element_line(color = "black")  # keep axis lines
   ) +
   geom_hline(yintercept = 0, colour = "black") +
-  geom_vline(data = means_sens, aes(xintercept = mean_val, linetype = model),
+  geom_vline(data = median_sens, aes(xintercept = median_val, linetype = model),
              colour = "black", linewidth = 0.1)+
   scale_y_continuous(expand = c(0,0)) +
-  labs(title = "Density comparison of 3 sensitivity models",
+  labs(title = "Comparison of sensitivity models",
        x = "Value", y = "Density")
 
 # makes data frame for 3 elasticity models
 df_all_elas_models <- data.frame(
   value = c(vec_elas_S1yr_sims, vec_elas_E1yr_sims, vec_elas_f1yr_sims),
-  model = rep(c("Model S", "Model E", "Model f"), each = 1000)
+  model = rep(c("Survival", "Emigration", "Recruitment"), each = 1000)
 )
 
 df_all_elas_models
 
-# calculate the mean value for each model
-means_elas <- df_all_elas_models %>%
+# calculate the median value for each model
+median_elas <- df_all_elas_models %>%
   group_by(model) %>%
-  summarise(mean_val = mean(value), .groups = "drop")
+  summarise(median_val = median(value), .groups = "drop")
 
 # Plot densities together with each mean line
 ggplot(df_all_elas_models, aes(x = value, colour = model, fill = model)) +
@@ -595,9 +626,9 @@ ggplot(df_all_elas_models, aes(x = value, colour = model, fill = model)) +
   theme(
     axis.line = element_line(color = "black")  # keep axis lines
   ) +
-  geom_vline(data = means_elas, aes(xintercept = mean_val, linetype = model),
+  geom_vline(data = median_elas, aes(xintercept = median_val, linetype = model),
              colour = "black", linewidth = 0.1)+
   geom_hline(yintercept = 0, colour = "black") +
   scale_y_continuous(expand = c(0,0)) +
-  labs(title = "Density comparison of 3 elasticity models",
+  labs(title = "Comparison of elasticity models",
        x = "Value", y = "Density")
